@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -10,16 +11,16 @@ return new class extends Migration
         $driver = DB::getDriverName();
 
         if ($driver === 'mysql') {
-            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('peserta','panitia','admin','bendahara') NOT NULL DEFAULT 'peserta'");
+            // Gabungkan SEMUA role yang kamu butuhkan di sini
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('peserta','panitia','admin','bendahara','mentor') NOT NULL DEFAULT 'peserta'");
         }
-        // SQLite (development): enum tidak di-enforce ketat.
-        // Jika muncul error, jalankan: php artisan migrate:fresh --seed
     }
 
     public function down(): void
     {
         if (DB::getDriverName() === 'mysql') {
-            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('peserta','panitia','admin') NOT NULL DEFAULT 'peserta'");
+            // Kembalikan ke pilihan standar jika rollback
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('peserta','panitia','admin','bendahara') NOT NULL DEFAULT 'peserta'");
         }
     }
 };

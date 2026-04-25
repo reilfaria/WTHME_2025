@@ -14,7 +14,7 @@ class User extends Authenticatable
         'name', 'email', 'password', 'role',
         'nim', 'angkatan', 'kelompok', 'divisi',
         'must_change_password',
-        'device_fingerprint', 'fingerprint_set_at',
+        'device_fingerprint', 'fingerprint_set_at','gender',
     ];
 
     protected $hidden = [
@@ -34,7 +34,7 @@ class User extends Authenticatable
     // Akses portal panitia: panitia, admin, bendahara
     public function isPanitia(): bool
     {
-        return in_array($this->role, ['panitia', 'admin', 'bendahara']);
+        return in_array($this->role, ['panitia', 'admin', 'bendahara','mentor']);
     }
 
     public function isPeserta(): bool
@@ -50,6 +50,11 @@ class User extends Authenticatable
     public function isBendahara(): bool
     {
         return in_array($this->role, ['bendahara', 'admin']);
+    }
+
+    public function isMentor(): bool
+    {
+        return in_array($this->role, ['mentor', 'admin']);
     }
 
     public function absensiPeserta()

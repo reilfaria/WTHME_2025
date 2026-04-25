@@ -24,7 +24,8 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'nim'      => ['required', 'string', 'unique:users,nim'],
-            'angkatan' => ['required', 'string'],
+            'angkatan' => ['required', 'digits:4', 'integer', 'min:2000'],
+            'gender' => ['required', 'in:L,P'],   // <-- TAMBAHKAN VALIDASI INI
             'kelompok' => ['required', 'string'],
             'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
@@ -35,6 +36,7 @@ class RegisteredUserController extends Controller
             'nim'                  => $request->nim,
             'angkatan'             => $request->angkatan,
             'kelompok'             => $request->kelompok,
+            'gender'   => $request->gender,
             'email'                => $request->email,
             'password'             => Hash::make($request->password),
             'role'                 => 'peserta',   // register publik SELALU peserta

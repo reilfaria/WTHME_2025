@@ -127,6 +127,20 @@
                     <div style="color:#002f45; opacity:0.5; font-size:0.75rem;">Catat hasil rapat & poin pembahasan divisi</div>
                 </div>
             </a>
+            {{-- Menu Mentoring --}}
+            @if(auth()->user()->isMentor())
+            <a href="{{ route('panitia.mentoring.index') }}"
+            style="text-decoration:none; background:white; border:2px solid #bdd1d3; border-radius:1rem; padding:1.25rem;
+                    display:flex; align-items:center; gap:1rem; transition:all 0.2s;"
+            onmouseover="this.style.borderColor='#002f45'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.borderColor='#bdd1d3'; this.style.transform='translateY(0)'">
+                <div style="width:44px;height:44px;background:#e0decd;border-radius:0.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.25rem;">👨‍🏫</div>
+                <div>
+                    <div style="color:#002f45; font-weight:700; font-size:0.9rem;">Mentoring</div>
+                    <div style="color:#002f45; opacity:0.5; font-size:0.75rem;">Catatan kegiatan dan kehadiran mentoring kelompok</div>
+                </div>
+            </a>
+            @endif
 
             {{-- Kas Bendahara (hanya untuk bendahara dan admin) --}}
             @if(auth()->user()->isBendahara())

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('nim')->unique()->nullable(); // NIM untuk peserta
             $table->string('email')->unique();
             $table->string('password');
-            $table->enum('role', ['peserta', 'panitia', 'admin'])->default('peserta');
+            $table->enum('role', ['peserta', 'panitia', 'admin', 'mentor'])->default('peserta');
             $table->string('angkatan')->nullable();
             $table->string('kelompok')->nullable();   // untuk peserta
             $table->string('divisi')->nullable();      // untuk panitia
