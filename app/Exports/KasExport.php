@@ -8,9 +8,11 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class KasExport implements WithMultipleSheets
 {
@@ -18,114 +20,130 @@ class KasExport implements WithMultipleSheets
 
     public function sheets(): array
     {
-        return [
-            new KasTransaksiSheet($this->filters),
-            new KasRingkasanDivisiSheet(),
-        ];
+        $sheets = [];
+        
+        // 1. Sheet Ringkasan Utama
+        $sheets[] = new KasRingkasanSheet();
+
+        // 2. Sheet Uang Masuk
+        $sheets[] = new KasTransaksiSpesifikSheet('masuk', 'Uang Masuk');
+
+        // 3. Sheet Uang Keluar (Semua Divisi)
+        $sheets[] = new KasTransaksiSpesifikSheet('keluar', 'Semua Uang Keluar');
+
+        // 4. Sheet Dinamis Per Divisi (Hanya untuk pengeluaran)
+        $divisiList = KasTransaksi::whereNotNull('divisi')->distinct()->pluck('divisi');
+        foreach ($divisiList as $namaDivisi) {
+            $sheets[] = new KasTransaksiSpesifikSheet('keluar', "Divisi $namaDivisi", $namaDivisi);
+        }
+
+        return $sheets;
     }
 }
 
-class KasTransaksiSheet implements FromCollection, WithHeadings, WithTitle, WithStyles
+/**
+ * Sheet untuk Transaksi Spesifik (Masuk/Keluar/Per Divisi)
+ */
+class KasTransaksiSpesifikSheet implements FromCollection, WithHeadings, WithTitle, WithStyles, ShouldAutoSize
 {
-    public function __construct(private array $filters = []) {}
+    public function __construct(
+        private string $jenis, 
+        private string $title, 
+        private ?string $divisi = null
+    ) {}
 
     public function collection()
     {
         $query = KasTransaksi::with('pencatat')
-            ->orderBy('tanggal', 'asc')
-            ->orderBy('id', 'asc');
+            ->where('jenis', $this->jenis)
+            ->orderBy('tanggal', 'asc');
 
-        if (!empty($this->filters['jenis'])) {
-            $query->where('jenis', $this->filters['jenis']);
-        }
-        if (!empty($this->filters['divisi'])) {
-            $query->where('divisi', $this->filters['divisi']);
+        if ($this->divisi) {
+            $query->where('divisi', $this->divisi);
         }
 
-        $rows    = $query->get();
-        $saldo   = 0;
-        $result  = collect();
-
-        foreach ($rows as $i => $t) {
-            $saldo += $t->jenis === 'masuk' ? $t->nominal : -$t->nominal;
-            $result->push([
-                'No'           => $i + 1,
-                'Tanggal'      => $t->tanggal->format('d/m/Y'),
-                'Jenis'        => strtoupper($t->jenis),
-                'Nominal'      => $t->nominal,
-                'Divisi'       => $t->divisi ?? '-',
-                'Keterangan'   => $t->keterangan,
-                'PIC'          => $t->pic,
-                'Saldo'        => $saldo,
-                'Dicatat Oleh' => $t->pencatat->name ?? '-',
-                'Waktu Input'  => $t->created_at->format('d/m/Y H:i'),
-            ]);
-        }
-
-        return $result;
+        return $query->get()->map(fn($t, $i) => [
+            $i + 1,
+            $t->tanggal->format('d/m/Y'),
+            $t->nominal,
+            $t->divisi ?? '-',
+            $t->pic,
+            $t->keterangan,
+            $t->pencatat->name ?? '-',
+        ]);
     }
 
     public function headings(): array
     {
-        return ['No', 'Tanggal', 'Jenis', 'Nominal (Rp)', 'Divisi', 'Keterangan', 'PIC', 'Saldo (Rp)', 'Dicatat Oleh', 'Waktu Input'];
+        return ['No', 'Tanggal', 'Nominal (Rp)', 'Divisi', 'PIC', 'Keterangan', 'Admin'];
     }
 
-    public function title(): string { return 'Semua Transaksi'; }
+    public function title(): string { return $this->title; }
 
     public function styles(Worksheet $sheet)
     {
-        return [
-            1 => [
-                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '002f45']],
-            ],
-        ];
+        // Styling Header
+        $sheet->getStyle('A1:G1')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '002f45']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        ]);
+
+        // Format angka untuk kolom Nominal (Kolom C)
+        $lastRow = $sheet->getHighestRow();
+        $sheet->getStyle("C2:C$lastRow")->getNumberFormat()->setFormatCode('#,##0');
+
+        return [];
     }
 }
 
-class KasRingkasanDivisiSheet implements FromCollection, WithHeadings, WithTitle, WithStyles
+/**
+ * Sheet Ringkasan (Dashboard)
+ */
+class KasRingkasanSheet implements FromCollection, WithHeadings, WithTitle, WithStyles, ShouldAutoSize
 {
     public function collection()
     {
-        $totalMasuk  = KasTransaksi::where('jenis', 'masuk')->sum('nominal');
+        $totalMasuk = KasTransaksi::where('jenis', 'masuk')->sum('nominal');
         $totalKeluar = KasTransaksi::where('jenis', 'keluar')->sum('nominal');
 
-        $divisi = KasTransaksi::where('jenis', 'keluar')
-            ->selectRaw('divisi, SUM(nominal) as total, COUNT(*) as jumlah')
+        $data = collect([
+            ['RINGKASAN SALDO', '', ''],
+            ['Total Pemasukan', $totalMasuk, ''],
+            ['Total Pengeluaran', $totalKeluar, ''],
+            ['Saldo Akhir', $totalMasuk - $totalKeluar, ''],
+            ['', '', ''],
+            ['PENGELUARAN PER DIVISI', 'Jumlah Transaksi', 'Total Nominal']
+        ]);
+
+        $perDivisi = KasTransaksi::where('jenis', 'keluar')
+            ->selectRaw('divisi, COUNT(*) as qty, SUM(nominal) as total')
             ->groupBy('divisi')
-            ->orderBy('total', 'desc')
-            ->get()
-            ->map(fn($r) => [
-                'Divisi'          => $r->divisi,
-                'Jumlah Transaksi'=> $r->jumlah,
-                'Total Pengeluaran'=> $r->total,
-                '% dari Total'    => $totalKeluar > 0
-                    ? round(($r->total / $totalKeluar) * 100, 1) . '%'
-                    : '0%',
-            ]);
+            ->get();
 
-        // Tambahkan baris total
-        $divisi->push(['Divisi' => 'TOTAL MASUK', 'Jumlah Transaksi' => '', 'Total Pengeluaran' => $totalMasuk, '% dari Total' => '']);
-        $divisi->push(['Divisi' => 'TOTAL KELUAR', 'Jumlah Transaksi' => '', 'Total Pengeluaran' => $totalKeluar, '% dari Total' => '']);
-        $divisi->push(['Divisi' => 'SALDO AKHIR', 'Jumlah Transaksi' => '', 'Total Pengeluaran' => $totalMasuk - $totalKeluar, '% dari Total' => '']);
+        foreach ($perDivisi as $row) {
+            $data->push([$row->divisi, $row->qty, $row->total]);
+        }
 
-        return $divisi;
+        return $data;
     }
 
-    public function headings(): array
-    {
-        return ['Divisi', 'Jumlah Transaksi', 'Total Pengeluaran (Rp)', '% dari Total Keluar'];
-    }
-
-    public function title(): string { return 'Ringkasan per Divisi'; }
+    public function headings(): array { return []; }
+    public function title(): string { return 'Ringkasan Laporan'; }
 
     public function styles(Worksheet $sheet)
     {
-        return [
-            1 => [
-                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '002f45']],
-            ],
-        ];
+        // Styling Judul Section
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A6')->getFont()->setBold(true)->setSize(14);
+
+        // Styling Border Table Ringkasan
+        $sheet->getStyle('A2:B4')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        
+        // Format Currency untuk nominal
+        $sheet->getStyle('B2:B4')->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('C7:C20')->getNumberFormat()->setFormatCode('#,##0');
+
+        return [];
     }
 }

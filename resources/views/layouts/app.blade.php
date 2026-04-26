@@ -15,7 +15,7 @@
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-3">
                     <img src="{{ asset('images/logo-kegiatan.png') }}" alt="Logo" class="h-10 w-10 object-contain">
-                    <span class="font-display text-sand text-lg font-semibold hidden sm:block">PKKMB 2024</span>
+                    <span class="font-display text-sand text-lg font-semibold hidden sm:block">WTHME 2025</span>
                 </div>
                 <div class="flex items-center gap-4">
                     <span class="text-teal text-sm hidden md:block">

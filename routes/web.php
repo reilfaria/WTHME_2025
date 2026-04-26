@@ -14,6 +14,7 @@ use App\Http\Controllers\TugasController;
 use App\Http\Controllers\KesehatanController;
 use App\Http\Controllers\NotulensiController;
 use App\Http\Controllers\MentoringController;
+use App\Http\Controllers\GanttController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -122,6 +123,14 @@ Route::middleware(['auth'])->group(function () {
 
             // Hapus satu sesi kegiatan (Tombol Hapus Kegiatan)
             Route::delete('/{id}', [MentoringController::class, 'destroy'])->name('destroy');
+            Route::get('/rekap-global', [MentoringController::class, 'rekapGlobal'])->name('rekap');
+            Route::get('/export-seluruh-kelompok', [MentoringController::class, 'exportSeluruh'])->name('export_seluruh');
+        });
+        Route::prefix('gantt')->name('gantt.')->group(function () {
+            Route::get('/', [GanttController::class, 'index'])->name('index');
+            Route::post('/', [GanttController::class, 'store'])->name('store');
+            Route::put('/{id}', [GanttController::class, 'update'])->name('update');
+            Route::delete('/{id}', [GanttController::class, 'destroy'])->name('destroy');
         });
     }); // <--- PENUTUP PANITIA (Tadi kamu lupa ini)
 

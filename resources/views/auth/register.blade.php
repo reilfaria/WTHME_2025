@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar — PKKMB</title>
+    <title>Daftar — WTHME</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
@@ -20,7 +20,7 @@
                 style="font-family:'Playfair Display',serif; color:#002f45; font-size:2rem; font-weight:700; margin-bottom:0.25rem;">
                 Pendaftaran Peserta
             </h1>
-            <p style="color:#002f45; opacity:0.6; font-size:0.875rem;">PKKMB Jurusan 2024</p>
+            <p style="color:#002f45; opacity:0.6; font-size:0.875rem;">WTHME 2025</p>
         </div>
 
         <div style="background:white; border-radius:1.25rem; padding:2rem; box-shadow:0 4px 24px rgba(0,47,69,0.1);">
@@ -71,7 +71,7 @@
                                 max="2099" oninput="if (this.value.length > 4) this.value = this.value.slice(0, 4)"
                                 style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.9rem; color:#002f45; box-sizing:border-box; outline:none;"
                                 onfocus="this.style.borderColor='#002f45'" onblur="this.style.borderColor='#bdd1d3'"
-                                placeholder="2024">>
+                                placeholder="2025">
                         </div>
                         <div>
                             <label

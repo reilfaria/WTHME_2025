@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\MentoringExport;
+use App\Exports\MentoringSeluruhExport; // <--- Tambahkan ini
 
 class MentoringController extends Controller
 {
@@ -87,7 +88,7 @@ class MentoringController extends Controller
     public function destroy($id)
     {
         $mentoring = Mentoring::findOrFail($id);
-        
+
         // Hapus detail secara manual jika di database tidak pakai 'onDelete cascade'
         $mentoring->details()->delete();
         $mentoring->delete();
@@ -99,6 +100,29 @@ class MentoringController extends Controller
     public function export($kelompok)
     {
         // Pastikan kamu sudah membuat file App\Exports\MentoringExport
-        return Excel::download(new MentoringExport($kelompok), 'mentoring_kelompok_'.$kelompok.'.xlsx');
+        return Excel::download(new MentoringExport($kelompok), 'mentoring_kelompok_' . $kelompok . '.xlsx');
+    }
+
+    public function rekapGlobal()
+    {
+        $rekapDetail = MentoringDetail::with(['mentoring', 'peserta'])
+            ->get()
+            ->groupBy([
+                function ($item) {
+                    return $item->peserta->kelompok;
+                }, // Kelompokkan berdasarkan Kelompok
+                function ($item) {
+                    return $item->mentoring->nama_kegiatan;
+                } // Lalu kelompokkan berdasarkan Kegiatan
+            ])
+            ->sortKeys(); // Urutkan Kelompok 1, 2, 3...
+
+        return view('panitia.mentoring.rekap', compact('rekapDetail'));
+    }
+
+    public function exportSeluruh()
+    {
+        // Ini akan memanggil class Export yang mendownload SEMUA kelompok
+        return Excel::download(new MentoringSeluruhExport, 'Master_Rekap_Mentoring.xlsx');
     }
 }
