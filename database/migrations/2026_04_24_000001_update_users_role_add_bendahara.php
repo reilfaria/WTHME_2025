@@ -12,7 +12,7 @@ return new class extends Migration
 
         if ($driver === 'mysql') {
             // Gabungkan SEMUA role yang kamu butuhkan di sini
-            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('peserta','panitia','admin','bendahara','mentor') NOT NULL DEFAULT 'peserta'");
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('peserta','panitia','admin','bendahara','mentor', 'korlap') NOT NULL DEFAULT 'peserta'");
         }
     }
 
@@ -20,7 +20,7 @@ return new class extends Migration
     {
         if (DB::getDriverName() === 'mysql') {
             // Kembalikan ke pilihan standar jika rollback
-            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('peserta','panitia','admin','bendahara') NOT NULL DEFAULT 'peserta'");
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('peserta','panitia','admin','bendahara', 'mentor') NOT NULL DEFAULT 'peserta'");
         }
     }
 };
