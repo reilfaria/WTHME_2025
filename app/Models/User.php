@@ -34,7 +34,7 @@ class User extends Authenticatable
     // Akses portal panitia: panitia, admin, bendahara
     public function isPanitia(): bool
     {
-        return in_array($this->role, ['panitia', 'admin', 'bendahara','mentor', 'korlap']);
+        return in_array($this->role, ['panitia', 'admin', 'bendahara','mentor', 'korlap', 'ketuplak']);
     }
 
     public function isPeserta(): bool
@@ -59,7 +59,7 @@ class User extends Authenticatable
 
     public function isKorlap(): bool
     {
-        return in_array($this->role, ['korlap', 'admin']);
+        return in_array($this->role, ['korlap', 'admin', 'ketuplak']);
     }
 
     public function absensiPeserta()

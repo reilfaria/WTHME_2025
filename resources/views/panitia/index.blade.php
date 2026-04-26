@@ -56,9 +56,11 @@
                     @if (auth()->user()->divisi)
                         — Divisi {{ auth()->user()->divisi }}
                     @endif
-                    @if (auth()->user()->role === 'bendahara')
+                    @if (in_array($roleName, ['bendahara', 'korlap', 'ketuplak', 'admin']))
                         <span
-                            style="background:#d2c296; color:#002f45; font-size:0.7rem; font-weight:700; padding:0.15rem 0.6rem; border-radius:999px; margin-left:0.5rem;">BENDAHARA</span>
+                            style="background:#d2c296; color:#002f45; font-size:0.7rem; font-weight:700; padding:0.15rem 0.6rem; border-radius:999px; margin-left:0.5rem;">
+                            {{ $badgeText }}
+                        </span>
                     @endif
                 </p>
             </div>
@@ -247,7 +249,6 @@
                                 </div>
                             </a>
                         @empty
-                            
                         @endforelse
                     </div>
 
