@@ -56,10 +56,18 @@
                     @if (auth()->user()->divisi)
                         — Divisi {{ auth()->user()->divisi }}
                     @endif
-                    @if (in_array($roleName, ['bendahara', 'korlap', 'ketuplak', 'admin']))
+                    @php
+                        // Definisikan role langsung dari auth
+                        $userRole = auth()->user()->role;
+
+                        // Daftar role yang mau dikasih badge
+                        $allowedRoles = ['bendahara', 'korlap', 'ketuplak', 'admin'];
+                    @endphp
+
+                    @if (in_array($userRole, $allowedRoles))
                         <span
-                            style="background:#d2c296; color:#002f45; font-size:0.7rem; font-weight:700; padding:0.15rem 0.6rem; border-radius:999px; margin-left:0.5rem;">
-                            {{ $badgeText }}
+                            style="background:#d2c296; color:#002f45; font-size:0.7rem; font-weight:700; padding:0.15rem 0.6rem; border-radius:999px; margin-left:0.5rem; text-transform: uppercase;">
+                            {{ $userRole }}
                         </span>
                     @endif
                 </p>
