@@ -103,7 +103,7 @@
                     Portal Peserta
                 </h3>
                 <p style="color:#002f45; font-size:0.85rem; opacity:0.6; line-height:1.6;">
-                    Lakukan absensi kegiatan, isi formulir kesehatan, dan akses informasi PKKMB
+                    Lakukan absensi kegiatan, isi formulir kesehatan, dan akses informasi WTHME
                 </p>
                 <div style="margin-top:1.5rem; display:flex; align-items:center; color:#002f45; font-size:0.85rem; font-weight:600;">
                     Masuk ke Portal
