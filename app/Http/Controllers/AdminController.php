@@ -31,6 +31,7 @@ class AdminController extends Controller
     // Proses upload & import
     public function importStore(Request $request)
     {
+        set_time_limit(0);
         $request->validate([
             'file' => ['required', 'file', 'mimes:xlsx,xls', 'max:5120'],
         ], [
