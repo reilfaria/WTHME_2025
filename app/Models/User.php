@@ -11,14 +11,23 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'role',
-        'nim', 'angkatan', 'kelompok', 'divisi',
+        'name',
+        'email',
+        'password',
+        'role',
+        'nim',
+        'angkatan',
+        'kelompok',
+        'divisi',
         'must_change_password',
-        'device_fingerprint', 'fingerprint_set_at','gender',
+        'device_fingerprint',
+        'fingerprint_set_at',
+        'gender',
     ];
 
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     protected function casts(): array
@@ -34,7 +43,7 @@ class User extends Authenticatable
     // Akses portal panitia: panitia, admin, bendahara
     public function isPanitia(): bool
     {
-        return in_array($this->role, ['panitia', 'admin', 'bendahara','mentor', 'korlap', 'ketuplak']);
+        return in_array($this->role, ['panitia', 'admin', 'bendahara', 'mentor', 'korlap', 'ketuplak']);
     }
 
     public function isPeserta(): bool
@@ -55,6 +64,11 @@ class User extends Authenticatable
     public function isMentor(): bool
     {
         return in_array($this->role, ['mentor', 'admin']);
+    }
+    public function isAcara(): bool
+    {
+        // Cek apakah divisi user adalah Acara, atau dia adalah Admin (Admin biasanya pegang semua akses)
+        return $this->divisi === 'ACARA' || $this->role === 'admin';
     }
 
     public function isKorlap(): bool

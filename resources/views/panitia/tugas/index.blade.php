@@ -8,7 +8,9 @@
             <div
                 style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
                 <div>
-                    <a href="{{ route('panitia.index') }}" style="color:#002f45; opacity:0.5; text-decoration:none; font-size:0.875rem; display:block; margin-bottom:1.5rem;"> ← Kembali</a>
+                    <a href="{{ route('panitia.index') }}"
+                        style="color:#002f45; opacity:0.5; text-decoration:none; font-size:0.875rem; display:block; margin-bottom:1.5rem;">
+                        ← Kembali</a>
                     <h1 style="font-family:'Playfair Display',serif; color:#002f45; font-size:1.75rem; font-weight:700;">📚
                         Kelola Tugas</h1>
                     <p style="color:#002f45; opacity:0.5; font-size:0.875rem;">Buat dan kelola jenis tugas yang harus
@@ -19,10 +21,12 @@
                         style="padding:0.6rem 1.25rem; background:#e0decd; color:#002f45; border-radius:0.6rem; text-decoration:none; font-size:0.875rem; font-weight:600; border:2px solid #bdd1d3;">
                         📊 Lihat Rekap
                     </a>
-                    <button onclick="toggleForm()"
-                        style="padding:0.6rem 1.25rem; background:#002f45; color:#d2c296; border-radius:0.6rem; border:none; cursor:pointer; font-size:0.875rem; font-weight:700;">
-                        + Buat Tugas Baru
-                    </button>
+                    @if (auth()->user()->isAcara())
+                        <button onclick="toggleForm()"
+                            style="padding:0.6rem 1.25rem; background:#002f45; color:#d2c296; border-radius:0.6rem; border:none; cursor:pointer; font-size:0.875rem; font-weight:700;">
+                            + Buat Tugas Baru
+                        </button>
+                    @endif
                 </div>
             </div>
 
@@ -152,10 +156,12 @@
                     style="background:white; border-radius:1rem; padding:3rem; text-align:center; border:2px solid #bdd1d3;">
                     <div style="font-size:3rem; margin-bottom:1rem;">📚</div>
                     <p style="color:#002f45; opacity:0.5; margin-bottom:1rem;">Belum ada jenis tugas yang dibuat.</p>
-                    <button onclick="toggleForm()"
-                        style="padding:0.75rem 2rem; background:#002f45; color:#d2c296; border:none; border-radius:0.75rem; cursor:pointer; font-weight:700; font-size:0.875rem;">
-                        + Buat Tugas Pertama
-                    </button>
+                    @if (auth()->user()->isAcara())
+                        <button onclick="toggleForm()"
+                            style="padding:0.75rem 2rem; background:#002f45; color:#d2c296; border:none; border-radius:0.75rem; cursor:pointer; font-weight:700; font-size:0.875rem;">
+                            + Buat Tugas Pertama
+                        </button>
+                    @endif
                 </div>
             @else
                 <div style="display:flex; flex-direction:column; gap:1rem;">
@@ -232,16 +238,18 @@
                                             {{ $tugas->aktif ? '⏸ Nonaktifkan' : '▶ Aktifkan' }}
                                         </button>
                                     </form>
-                                    <form method="POST" action="{{ route('panitia.tugas.destroy', $tugas->id) }}"
-                                        style="margin:0;"
-                                        onsubmit="return confirm('Hapus tugas ini beserta SEMUA file pengumpulan peserta?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            style="width:100%; padding:0.4rem 0.75rem; background:#fee2e2; color:#991b1b; border:none; border-radius:0.4rem; cursor:pointer; font-size:0.75rem; font-weight:600;">
-                                            🗑 Hapus
-                                        </button>
-                                    </form>
+                                    @if (auth()->user()->isAcara())
+                                        <form method="POST" action="{{ route('panitia.tugas.destroy', $tugas->id) }}"
+                                            style="margin:0;"
+                                            onsubmit="return confirm('Hapus tugas ini beserta SEMUA file pengumpulan peserta?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                style="width:100%; padding:0.4rem 0.75rem; background:#fee2e2; color:#991b1b; border:none; border-radius:0.4rem; cursor:pointer; font-size:0.75rem; font-weight:600;">
+                                                🗑 Hapus
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
                         </div>
