@@ -83,10 +83,11 @@ Route::middleware(['auth'])->group(function () {
 
             // Semua panitia bisa melihat daftar kas
             Route::get('/', [KasController::class, 'index'])->name('index');
+            Route::post('/',       [KasController::class, 'store'])->name('store');
 
             // Hanya Bendahara yang bisa input, hapus, dan export
             Route::middleware('bendahara')->group(function () {
-                Route::post('/',       [KasController::class, 'store'])->name('store');
+                
                 Route::delete('/{id}', [KasController::class, 'destroy'])->name('destroy');
                 Route::get('/export',  [KasController::class, 'export'])->name('export');
             });
