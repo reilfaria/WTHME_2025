@@ -78,11 +78,18 @@ Route::middleware(['auth'])->group(function () {
         });
 
         // KAS
-        Route::middleware('bendahara')->prefix('kas')->name('kas.')->group(function () {
-            Route::get('/',        [KasController::class, 'index'])->name('index');
-            Route::post('/',       [KasController::class, 'store'])->name('store');
-            Route::delete('/{id}', [KasController::class, 'destroy'])->name('destroy');
-            Route::get('/export',  [KasController::class, 'export'])->name('export');
+        // --- KAS (Akses Terbuka untuk semua Panitia) ---
+        Route::prefix('kas')->name('kas.')->group(function () {
+
+            // Semua panitia bisa melihat daftar kas
+            Route::get('/', [KasController::class, 'index'])->name('index');
+
+            // Hanya Bendahara yang bisa input, hapus, dan export
+            Route::middleware('bendahara')->group(function () {
+                Route::post('/',       [KasController::class, 'store'])->name('store');
+                Route::delete('/{id}', [KasController::class, 'destroy'])->name('destroy');
+                Route::get('/export',  [KasController::class, 'export'])->name('export');
+            });
         });
 
         // TUGAS
@@ -104,28 +111,24 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/export/{id}', [ExportController::class, 'exportNotulensi'])->name('export');
         });
         // --- MENTORING ---
+        // --- MENTORING ---
         Route::prefix('mentoring')->name('mentoring.')->group(function () {
-            // Halaman utama (Daftar Kelompok)
+            // SEMUA PANITIA bisa akses ini (Read-Only)
             Route::get('/', [MentoringController::class, 'index'])->name('index');
-
-            // Halaman Input & Riwayat per Kelompok
+            Route::get('/rekap-global', [MentoringController::class, 'rekapGlobal'])->name('rekap');
             Route::get('/kelompok/{kelompok}', [MentoringController::class, 'kelompok'])->name('kelompok');
 
-            // Simpan Absensi Baru
-            Route::post('/kelompok/{kelompok}', [MentoringController::class, 'store'])->name('store');
-
-            // Export Data
-            Route::get('/kelompok/{kelompok}/export', [MentoringController::class, 'export'])->name('export');
-
-            // --- FITUR BARU: EDIT & HAPUS ---
-            // Update kehadiran per baris (Untuk Modal Edit)
-            Route::put('/detail/{id}', [MentoringController::class, 'updateDetail'])->name('updateDetail');
-
-            // Hapus satu sesi kegiatan (Tombol Hapus Kegiatan)
-            Route::delete('/{id}', [MentoringController::class, 'destroy'])->name('destroy');
-            Route::get('/rekap-global', [MentoringController::class, 'rekapGlobal'])->name('rekap');
-            Route::get('/export-seluruh-kelompok', [MentoringController::class, 'exportSeluruh'])->name('export_seluruh');
+            // HANYA ROLE TERTENTU (Misal: Admin/Sekretaris/Bendahara/Mentor) yang bisa Edit/Input
+            // Jika ingin semua panitia bisa lihat tapi hanya 'mentor' yang bisa isi, ganti middlewarenya
+            Route::middleware('mentor')->group(function () {
+                Route::post('/kelompok/{kelompok}', [MentoringController::class, 'store'])->name('store');
+                Route::put('/detail/{id}', [MentoringController::class, 'updateDetail'])->name('updateDetail');
+                Route::delete('/{id}', [MentoringController::class, 'destroy'])->name('destroy');
+                Route::get('/kelompok/{kelompok}/export', [MentoringController::class, 'export'])->name('export');
+                Route::get('/export-seluruh-kelompok', [MentoringController::class, 'exportSeluruh'])->name('export_seluruh');
+            });
         });
+
         Route::prefix('gantt')->name('gantt.')->group(function () {
             Route::get('/', [GanttController::class, 'index'])->name('index');
             Route::post('/', [GanttController::class, 'store'])->name('store');

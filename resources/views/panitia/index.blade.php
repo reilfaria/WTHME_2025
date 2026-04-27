@@ -181,7 +181,7 @@
                     @endforeach
 
                     {{-- Mentoring Special --}}
-                    @if (auth()->user()->isMentor())
+                    @if (auth()->user()->isPanitia())
                         <a href="{{ route('panitia.mentoring.index') }}"
                             style="text-decoration:none; background:white; border:2px solid #bdd1d3; border-radius:1rem; padding:1.25rem; display:flex; align-items:center; gap:1rem; transition:all 0.2s;">
                             <div
@@ -196,7 +196,7 @@
                     @endif
 
                     {{-- Kas Bendahara Special --}}
-                    @if (auth()->user()->isBendahara())
+                    @if (auth()->user()->isPanitia())
                         <a href="{{ route('panitia.kas.index') }}"
                             style="text-decoration:none; background:#002f45; border:2px solid #002f45; border-radius:1rem; padding:1.25rem; display:flex; align-items:center; gap:1rem; transition:all 0.2s;">
                             <div

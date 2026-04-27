@@ -48,88 +48,98 @@
         {{-- KONDISI 1: JIKA KELOMPOK SUDAH DIPILIH --}}
         @if (isset($kelompok))
             {{-- Form Input --}}
-            <div
-                style="background:white; border-radius:1.25rem; padding:2rem; border:2px solid #bdd1d3; margin-bottom:2rem;">
-                <h3
-                    style="color:#002f45; font-weight:700; font-size:1rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem;">
-                    📝 Catat Pertemuan Baru - Kelompok {{ $kelompok }}
-                </h3>
+            @if (auth()->user()->role === 'bendahara' || auth()->user()->role === 'admin')
+                <div
+                    style="background:white; border-radius:1.25rem; padding:2rem; border:2px solid #bdd1d3; margin-bottom:2rem;">
+                    <h3
+                        style="color:#002f45; font-weight:700; font-size:1rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem;">
+                        📝 Catat Pertemuan Baru - Kelompok {{ $kelompok }}
+                    </h3>
 
-                <form method="POST" action="{{ route('panitia.mentoring.store', $kelompok) }}">
-                    @csrf
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:2rem;">
-                        <div>
-                            <label
-                                style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Nama
-                                Kegiatan/Materi *</label>
-                            <input type="text" name="nama_kegiatan" required placeholder="Misal: Adab Penuntut Ilmu"
-                                style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.875rem; color:#002f45; outline:none;">
+                    <form method="POST" action="{{ route('panitia.mentoring.store', $kelompok) }}">
+                        @csrf
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:2rem;">
+                            <div>
+                                <label
+                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Nama
+                                    Kegiatan/Materi *</label>
+                                <input type="text" name="nama_kegiatan" required placeholder="Misal: Adab Penuntut Ilmu"
+                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.875rem; color:#002f45; outline:none;">
+                            </div>
+                            <div>
+                                <label
+                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Tanggal
+                                    *</label>
+                                <input type="date" name="tanggal" value="{{ date('Y-m-d') }}" required
+                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.875rem; color:#002f45; outline:none;">
+                            </div>
                         </div>
-                        <div>
-                            <label
-                                style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Tanggal
-                                *</label>
-                            <input type="date" name="tanggal" value="{{ date('Y-m-d') }}" required
-                                style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.875rem; color:#002f45; outline:none;">
-                        </div>
-                    </div>
 
-                    <div style="background:#f9f8f6; border-radius:1rem; padding:1.25rem; border:1px solid #e0decd;">
-                        <div
-                            style="font-size:0.75rem; color:#002f45; opacity:0.5; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1rem; font-weight:700;">
-                            Presensi Anggota</div>
+                        <div style="background:#f9f8f6; border-radius:1rem; padding:1.25rem; border:1px solid #e0decd;">
+                            <div
+                                style="font-size:0.75rem; color:#002f45; opacity:0.5; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1rem; font-weight:700;">
+                                Presensi Anggota</div>
 
-                        <div style="overflow-x:auto;">
-                            <table style="width:100%; border-collapse:collapse;">
-                                <thead>
-                                    <tr style="border-bottom:2px solid #bdd1d3;">
-                                        <th style="padding:0.75rem; text-align:left; color:#002f45; font-size:0.75rem;">
-                                            NAMA PESERTA</th>
-                                        <th style="padding:0.75rem; text-align:left; color:#002f45; font-size:0.75rem;">
-                                            NIM</th>
-                                        <th
-                                            style="padding:0.75rem; text-align:left; color:#002f45; font-size:0.75rem; width:180px;">
-                                            KEHADIRAN</th>
-                                        <th style="padding:0.75rem; text-align:left; color:#002f45; font-size:0.75rem;">
-                                            CATATAN</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($peserta as $p)
-                                        <tr style="border-bottom:1px solid #e0decd;">
-                                            <td
-                                                style="padding:1rem 0.75rem; color:#002f45; font-weight:600; font-size:0.875rem;">
-                                                {{ $p->name }}</td>
-                                            <td style="padding:1rem 0.75rem; color:#002f45; opacity:0.6; font-size:0.8rem;">
-                                                {{ $p->nim }}</td>
-                                            <td style="padding:1rem 0.75rem;">
-                                                <select name="kehadiran[{{ $p->id }}]" required
-                                                    style="width:100%; padding:0.5rem; border:2px solid #bdd1d3; border-radius:0.5rem; font-size:0.8rem; background:white;">
-                                                    <option value="Hadir">Hadir</option>
-                                                    <option value="Izin">Izin</option>
-                                                    <option value="Alpha">Alpha</option>
-                                                </select>
-                                            </td>
-                                            <td style="padding:1rem 0.75rem;">
-                                                <input type="text" name="keterangan[{{ $p->id }}]"
-                                                    placeholder="Opsional..."
-                                                    style="width:100%; padding:0.5rem; border:1px solid #bdd1d3; border-radius:0.5rem; font-size:0.8rem;">
-                                            </td>
+                            <div style="overflow-x:auto;">
+                                <table style="width:100%; border-collapse:collapse;">
+                                    <thead>
+                                        <tr style="border-bottom:2px solid #bdd1d3;">
+                                            <th style="padding:0.75rem; text-align:left; color:#002f45; font-size:0.75rem;">
+                                                NAMA PESERTA</th>
+                                            <th style="padding:0.75rem; text-align:left; color:#002f45; font-size:0.75rem;">
+                                                NIM</th>
+                                            <th
+                                                style="padding:0.75rem; text-align:left; color:#002f45; font-size:0.75rem; width:180px;">
+                                                KEHADIRAN</th>
+                                            <th style="padding:0.75rem; text-align:left; color:#002f45; font-size:0.75rem;">
+                                                CATATAN</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($peserta as $p)
+                                            <tr style="border-bottom:1px solid #e0decd;">
+                                                <td
+                                                    style="padding:1rem 0.75rem; color:#002f45; font-weight:600; font-size:0.875rem;">
+                                                    {{ $p->name }}</td>
+                                                <td
+                                                    style="padding:1rem 0.75rem; color:#002f45; opacity:0.6; font-size:0.8rem;">
+                                                    {{ $p->nim }}</td>
+                                                <td style="padding:1rem 0.75rem;">
+                                                    <select name="kehadiran[{{ $p->id }}]" required
+                                                        style="width:100%; padding:0.5rem; border:2px solid #bdd1d3; border-radius:0.5rem; font-size:0.8rem; background:white;">
+                                                        <option value="Hadir">Hadir</option>
+                                                        <option value="Izin">Izin</option>
+                                                        <option value="Alpha">Alpha</option>
+                                                    </select>
+                                                </td>
+                                                <td style="padding:1rem 0.75rem;">
+                                                    <input type="text" name="keterangan[{{ $p->id }}]"
+                                                        placeholder="Opsional..."
+                                                        style="width:100%; padding:0.5rem; border:1px solid #bdd1d3; border-radius:0.5rem; font-size:0.8rem;">
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
 
-                    <div style="margin-top:1.5rem; display:flex; justify-content:flex-end;">
-                        <button type="submit"
-                            style="padding:0.875rem 2.5rem; background:#002f45; color:#d2c296; font-weight:700; border:none; border-radius:0.75rem; cursor:pointer; font-size:0.95rem;">
-                            💾 Simpan Laporan Mentoring
-                        </button>
-                    </div>
-                </form>
-            </div>
+                        <div style="margin-top:1.5rem; display:flex; justify-content:flex-end;">
+                            <button type="submit"
+                                style="padding:0.875rem 2.5rem; background:#002f45; color:#d2c296; font-weight:700; border:none; border-radius:0.75rem; cursor:pointer; font-size:0.95rem;">
+                                💾 Simpan Laporan Mentoring
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            @else
+                {{-- Pesan untuk Panitia Biasa --}}
+                <div
+                    style="background:#f0fdf4; border-radius:1rem; padding:1.5rem; border:1px solid #bbf7d0; margin-bottom:2rem; color:#166534; font-size:0.875rem;">
+                    ℹ️ <strong>Mode Lihat:</strong> Anda dapat melihat riwayat mentoring kelompok ini, namun tidak memiliki
+                    akses untuk menambah atau mengubah data.
+                </div>
+            @endif
 
             {{-- Riwayat Tabel --}}
             {{-- Riwayat Tabel --}}
@@ -150,15 +160,17 @@
                                 {{ date('d F Y', strtotime($men->tanggal)) }}</span>
                         </div>
                         {{-- Tombol Hapus Seluruh Kegiatan --}}
-                        <form method="POST" action="{{ route('panitia.mentoring.destroy', $men->id) }}"
-                            onsubmit="return confirm('Hapus seluruh catatan kegiatan ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                style="background:none; border:none; color:#991b1b; cursor:pointer; font-size:0.8rem; font-weight:700; display:flex; align-items:center; gap:0.25rem;">
-                                🗑️ Hapus Kegiatan
-                            </button>
-                        </form>
+                        @if (auth()->user()->role === 'bendahara' || auth()->user()->role === 'admin')
+                            <form method="POST" action="{{ route('panitia.mentoring.destroy', $men->id) }}"
+                                onsubmit="return confirm('Hapus seluruh catatan kegiatan ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    style="background:none; border:none; color:#991b1b; cursor:pointer; font-size:0.8rem; font-weight:700; display:flex; align-items:center; gap:0.25rem;">
+                                    🗑️ Hapus Kegiatan
+                                </button>
+                            </form>
+                        @endif
                     </div>
 
                     <div style="background:white; border-radius:0 0 1rem 1rem; overflow:hidden; border:2px solid #bdd1d3;">
@@ -210,11 +222,13 @@
                                                 {{ $det->keterangan ?? '—' }}
                                             </td>
                                             <td style="padding:0.875rem 1rem; text-align:center;">
-                                                <button
-                                                    onclick="openEditModal('{{ $det->id }}', '{{ $det->kehadiran }}', '{{ $det->keterangan }}')"
-                                                    style="background:#e0decd; border:1px solid #bdd1d3; border-radius:0.4rem; padding:0.3rem 0.6rem; cursor:pointer; font-size:0.75rem; color:#002f45; font-weight:700;">
-                                                    ✏️ Edit
-                                                </button>
+                                                @if (auth()->user()->role === 'bendahara' || auth()->user()->role === 'admin')
+                                                    <button
+                                                        onclick="openEditModal('{{ $det->id }}', '{{ $det->kehadiran }}', '{{ $det->keterangan }}')"
+                                                        style="background:#e0decd; border:1px solid #bdd1d3; border-radius:0.4rem; padding:0.3rem 0.6rem; cursor:pointer; font-size:0.75rem; color:#002f45; font-weight:700;">
+                                                        ✏️ Edit
+                                                    </button>
+                                                @endif <span style="color:#ccc; font-size:0.75rem;">No Access</span>
                                             </td>
                                         </tr>
                                     @endforeach
