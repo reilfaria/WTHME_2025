@@ -7,14 +7,12 @@
     <title>Masuk — WTHME</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 
-<body class="min-h-screen flex" style="background-color: #e0decd00; font-family: 'Plus Jakarta Sans', sans-serif;">
+<body class="min-h-screen flex" style="background-color: #e0decd; font-family: 'Plus Jakarta Sans', sans-serif;">
 
-    {{-- Panel Kiri: Branding --}}
+    {{-- Panel Kiri: Branding (Hanya muncul di Desktop) --}}
     <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden" style="background-color: #e0decd;">
         {{-- Pattern background --}}
         <div class="absolute inset-0 opacity-10">
@@ -30,92 +28,71 @@
 
         <div class="relative z-10 flex flex-col items-center justify-center w-full p-12 text-center">
             <div class="flex gap-6 mb-10">
-
-                {{-- Logo Universitas --}}
                 <div class="w-20 h-20 flex items-center justify-center">
                     <img src="{{ asset('images/logo-universitas.png') }}" class="w-32 h-32 object-contain">
                 </div>
-
-                {{-- Logo Himpunan (BARU) --}}
                 <div class="w-20 h-20 flex items-center justify-center">
                     <img src="{{ asset('images/logo-himpunan.png') }}" class="w-28 h-28 object-contain">
                 </div>
-
-                {{-- Logo Kegiatan --}}
                 <div class="w-20 h-20 flex items-center justify-center">
                     <img src="{{ asset('images/logo-kegiatan.png') }}" class="w-24 h-24 object-contain">
                 </div>
-
             </div>
 
-            <h1
-                style="font-family:'Poppins',serif; color:#002f45; font-size:2.5rem; font-weight:700; line-height:1.2; margin-bottom:1rem;">
+            <h1 style="font-family:'Plus Jakarta Sans', sans-serif; color:#002f45; font-size:2.5rem; font-weight:700; line-height:1.2; margin-bottom:1rem;">
                 WTHME 2025
             </h1>
-            <h2
-                style="font-family:'Playfair Display',serif; color:#002f45; font-size:1.25rem; font-style:italic; margin-bottom:1.5rem;">
+            <h2 style="font-family:'Playfair Display',serif; color:#002f45; font-size:1.25rem; font-style:italic; margin-bottom:1.5rem;">
                 Welcome To Himpunan Mahasiswa Elektro 2025
             </h2>
-            <p style="color:#002f45; font-size:0.875rem; max-width:320px; line-height:1.7;">
-                WTHME 2025 adalah kegiatan orientasi mahasiswa baru Teknik Elektro yang bertujuan membentuk karakter
-                beretika, loyal, dan memiliki semangat kekeluargaan, sekaligus membantu mahasiswa beradaptasi, mengenal
-                lingkungan jurusan, serta mengembangkan potensi diri di bidang akademik dan organisasi.
+            <p style="color:#002f45; font-size:0.875rem; max-width:320px; line-height:1.7; opacity: 0.8;">
+                Kegiatan orientasi mahasiswa baru Teknik Elektro yang membentuk karakter beretika, loyal, dan kekeluargaan.
             </p>
-
-            <div class="mt-12 flex gap-8 text-center">
-                {{-- <div>
-                    <div style="color:#d2c296; font-size:1.75rem; font-weight:800;">500+</div>
-                    <div style="color:#002f45; font-size:0.75rem; opacity:0.7;">Peserta</div>
-                </div>
-                <div style="width:1px; background:rgba(189,209,211,0.2);"></div>
-                <div>
-                    <div style="color:#d2c296; font-size:1.75rem; font-weight:800;">50+</div>
-                    <div style="color:#002f45; font-size:0.75rem; opacity:0.7;">Panitia</div>
-                </div>
-                <div style="width:1px; background:rgba(189,209,211,0.2);"></div>
-                <div>
-                    <div style="color:#d2c296; font-size:1.75rem; font-weight:800;">3</div>
-                    <div style="color:#002f45; font-size:0.75rem; opacity:0.7;">Hari</div>
-                </div> --}}
-            </div>
         </div>
     </div>
 
-    {{-- Panel Kanan: Form Login --}}
-    <div class="w-full lg:w-1/2 flex items-center justify-center p-8 relative"
+    {{-- Panel Kanan: Form Login (Glassmorphism Style) --}}
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 relative"
         style="
-        background-image: linear-gradient(rgba(224, 222, 205, 0.79), rgba(224, 222, 205, 0.659)), url('{{ asset('images/background-login.jpg') }}');
+        background-image: linear-gradient(rgba(224, 222, 205, 0.6), rgba(224, 222, 205, 0.5)), url('{{ asset('images/background-login.jpg') }}');
         background-size: cover;
         background-position: center;
-        background-repeat: no-repeat;
     ">
+        
+        {{-- Card Glass --}}
+        <div class="w-full max-w-md z-10 p-8 lg:p-10" 
+             style="background: rgba(255, 255, 255, 0.2); 
+                    backdrop-filter: blur(15px); 
+                    -webkit-backdrop-filter: blur(15px); 
+                    border: 1px solid rgba(255, 255, 255, 0.3); 
+                    border-radius: 2rem; 
+                    box-shadow: 0 8px 32px 0 rgba(0, 47, 69, 0.1);">
 
-        <div class="w-full max-w-md relative z-10"> {{-- Z-index agar form tetap di atas --}}
-
-            {{-- Mobile Logo --}}
+            {{-- Mobile Logo (Muncul di HP) --}}
             <div class="lg:hidden flex justify-center gap-4 mb-8">
-                <div class="w-14 h-14 rounded-xl flex items-center justify-center" style="background:#002f45;">
-                    <img src="{{ asset('images/logo-universitas.png') }}" alt=""
-                        class="w-10 h-10 object-contain">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: rgba(0, 47, 69, 0.9);">
+                    <img src="{{ asset('images/logo-universitas.png') }}" class="w-8 h-8 object-contain">
                 </div>
-                <div class="w-14 h-14 rounded-xl flex items-center justify-center" style="background:#002f45;">
-                    <img src="{{ asset('images/logo-kegiatan.png') }}" alt="" class="w-10 h-10 object-contain">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: rgba(0, 47, 69, 0.9);">
+                    <img src="{{ asset('images/logo-himpunan.png') }}" class="w-8 h-8 object-contain">
+                </div>
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: rgba(0, 47, 69, 0.9);">
+                    <img src="{{ asset('images/logo-kegiatan.png') }}" class="w-8 h-8 object-contain">
                 </div>
             </div>
 
-            <h2
-                style="font-family:'Playfair Display',serif; color:#002f45; font-size:2rem; font-weight:700; margin-bottom:0.5rem;">
+            <h2 style="font-family:'Playfair Display',serif; color:#002f45; font-size:2rem; font-weight:700; margin-bottom:0.5rem; text-align: center;">
                 Selamat Datang
             </h2>
-            <p style="color:#002f45; opacity:0.7; margin-bottom:2rem; font-size:0.9rem; font-weight: 500;">
+            <p style="color:#002f45; opacity:0.8; margin-bottom:2rem; font-size:0.9rem; font-weight: 500; text-align: center;">
                 Masuk ke akun WTHME kamu
             </p>
 
-            {{-- Form Login dan Error tetap sama di bawah sini --}}
+            {{-- Error Handling --}}
             @if ($errors->any())
-                <div class="mb-4 p-4 rounded-xl" style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b;">
+                <div class="mb-4 p-4 rounded-xl" style="background: rgba(254, 226, 226, 0.6); border: 1px solid rgba(153, 27, 27, 0.2); color:#991b1b;">
                     @foreach ($errors->all() as $error)
-                        <p class="text-sm">{{ $error }}</p>
+                        <p class="text-xs font-bold">× {{ $error }}</p>
                     @endforeach
                 </div>
             @endif
@@ -124,51 +101,69 @@
                 @csrf
                 {{-- Email Input --}}
                 <div>
-                    <label
-                        style="display:block; font-size:0.875rem; font-weight:600; color:#002f45; margin-bottom:0.5rem;">
+                    <label style="display:block; font-size:0.8rem; font-weight:700; color:#002f45; margin-bottom:0.5rem; text-transform: uppercase;">
                         Email
                     </label>
                     <input type="email" name="email" value="{{ old('email') }}" required
-                        style="width:100%; padding:0.875rem 1rem; border:2px solid #bdd1d3; border-radius:0.75rem; 
-                           background:rgba(255, 255, 255, 0.9); color:#002f45; font-size:0.9rem; outline:none; transition:border-color 0.2s;
-                           box-sizing:border-box;"
-                        onfocus="this.style.borderColor='#002f45'" onblur="this.style.borderColor='#bdd1d3'"
+                        style="width:100%; padding:0.875rem 1rem; border:1px solid rgba(0, 47, 69, 0.1); border-radius:1rem; 
+                               background:rgba(255, 255, 255, 0.4); color:#002f45; font-size:0.9rem; outline:none; transition: all 0.3s;"
+                        onfocus="this.style.background='white'; this.style.borderColor='#002f45'" 
+                        onblur="this.style.background='rgba(255, 255, 255, 0.4)'; this.style.borderColor='rgba(0, 47, 69, 0.1)'"
                         placeholder="email@example.com">
                 </div>
 
                 {{-- Password Input --}}
                 <div>
-                    <label
-                        style="display:block; font-size:0.875rem; font-weight:600; color:#002f45; margin-bottom:0.5rem;">
+                    <label style="display:block; font-size:0.8rem; font-weight:700; color:#002f45; margin-bottom:0.5rem; text-transform: uppercase;">
                         Password
                     </label>
-                    <input type="password" name="password" required
-                        style="width:100%; padding:0.875rem 1rem; border:2px solid #bdd1d3; border-radius:0.75rem; 
-                           background:rgba(255, 255, 255, 0.9); color:#002f45; font-size:0.9rem; outline:none; transition:border-color 0.2s;
-                           box-sizing:border-box;"
-                        onfocus="this.style.borderColor='#002f45'" onblur="this.style.borderColor='#bdd1d3'"
-                        placeholder="Password kamu">
+                    <input type="password" name="password" id="password_input" required
+                        style="width:100%; padding:0.875rem 1rem; border:1px solid rgba(0, 47, 69, 0.1); border-radius:1rem; 
+                               background:rgba(255, 255, 255, 0.4); color:#002f45; font-size:0.9rem; outline:none; transition: all 0.3s;"
+                        onfocus="this.style.background='white'; this.style.borderColor='#002f45'" 
+                        onblur="this.style.background='rgba(255, 255, 255, 0.4)'; this.style.borderColor='rgba(0, 47, 69, 0.1)'"
+                        placeholder="••••••••">
+
+                    {{-- Toggle Show Password --}}
+                    <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="toggle_password" style="cursor: pointer;">
+                        <label for="toggle_password" style="font-size: 0.75rem; color: #002f45; cursor: pointer; font-weight: 600;">
+                            Lihat Password
+                        </label>
+                    </div>
                 </div>
 
                 <button type="submit"
-                    style="width:100%; padding:0.875rem; background:#002f45; color:#d2c296; font-weight:700; 
-                       font-size:1rem; border:none; border-radius:0.75rem; cursor:pointer; 
-                       transition:background 0.2s; letter-spacing:0.025em;"
-                    onmouseover="this.style.background='#00405e'" onmouseout="this.style.background='#002f45'">
+                    style="width:100%; padding:1rem; background:#002f45; color:#d2c296; font-weight:700; 
+                           font-size:1rem; border:none; border-radius:1rem; cursor:pointer; 
+                           transition:transform 0.2s, background 0.2s; box-shadow: 0 4px 15px rgba(0, 47, 69, 0.2);"
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.background='#003d59'" 
+                    onmouseout="this.style.transform='translateY(0)'; this.style.background='#002f45'">
                     Masuk
                 </button>
             </form>
 
-            <div style="text-align:center; margin-top:1.5rem; color:#002f45; font-weight:500; font-size:0.875rem;">
+            <div style="text-align:center; margin-top:2rem; color:#002f45; font-weight:600; font-size:0.85rem;">
                 Belum punya akun?
                 <a href="{{ route('register') }}"
-                    style="color:#002f45; font-weight:700; text-decoration:none; border-bottom: 2px solid #d2c296;">
+                    style="color:#002f45; font-weight:800; text-decoration:none; border-bottom: 2px solid #d2c296; padding-bottom: 2px;">
                     Daftar sekarang
                 </a>
             </div>
         </div>
     </div>
 
-</body>
+    {{-- Script Logic --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password_input');
+            const toggleCheckbox = document.getElementById('toggle_password');
 
+            toggleCheckbox.addEventListener('change', function() {
+                passwordInput.type = this.checked ? 'text' : 'password';
+            });
+        });
+    </script>
+
+</body>
 </html>

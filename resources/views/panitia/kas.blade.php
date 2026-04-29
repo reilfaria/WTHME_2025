@@ -1,319 +1,190 @@
 @extends('layouts.app')
 
 @section('content')
-    {{-- Tambahan CSS khusus responsif tanpa merubah inline style di bawah --}}
+    {{-- CSS Responsif & Glass Effect --}}
     <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 1.5rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        }
+
         @media (max-width: 768px) {
-
-            /* Membuat Summary Cards tumpuk vertikal di HP */
-            .summary-grid-mobile {
-                grid-template-columns: 1fr !important;
-            }
-
-            /* Membuat Form Input tumpuk vertikal di HP */
-            .form-grid-mobile {
-                grid-template-columns: 1fr !important;
-            }
-
-            /* Header biar tidak tabrakan di HP */
-            .header-mobile {
-                flex-direction: column !important;
-                align-items: flex-start !important;
-            }
+            .summary-grid-mobile { grid-template-columns: 1fr !important; }
+            .form-grid-mobile { grid-template-columns: 1fr !important; }
+            .header-mobile { flex-direction: column !important; align-items: flex-start !important; }
         }
     </style>
 
-    <div style="min-height:calc(100vh - 64px); padding:2rem 1.5rem;">
+    <div style="min-height:calc(100vh - 64px); padding:3rem 1.5rem; background: linear-gradient(135deg, #e0decd 0%, #d2c296 100%); font-family: 'Inter', sans-serif;">
         <div style="max-width:1200px; margin:0 auto;">
 
             {{-- Header --}}
-            <div class="header-mobile"
-                style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+            <div class="header-mobile" style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:2.5rem; flex-wrap:wrap; gap:1.5rem;">
                 <div>
                     <a href="{{ route('panitia.index') }}"
-                        style="color:#002f45; opacity:0.5; text-decoration:none; font-size:0.875rem; display:block; margin-bottom:0.25rem;">←
-                        Kembali ke Portal Panitia</a>
-                    <h1 style="font-family:'Playfair Display',serif; color:#002f45; font-size:1.75rem; font-weight:700;">📒
-                        Kas Event</h1>
-                    <p style="color:#002f45; opacity:0.5; font-size:0.875rem;">Pencatatan pemasukan dan pengeluaran kas
-                        panitia</p>
+                        style="color:#002f45; opacity:0.7; text-decoration:none; font-size:0.9rem; display:inline-flex; align-items:center; margin-bottom:1rem; transition:0.3s;"
+                        onmouseover="this.style.opacity='1'; this.style.transform='translateX(-5px)'"
+                        onmouseout="this.style.opacity='0.7'; this.style.transform='translateX(0)'">
+                        <span style="margin-right:8px;">←</span> Kembali ke Portal
+                    </a>
+                    <h1 style="font-family:'Playfair Display',serif; color:#002f45; font-size:2.5rem; font-weight:800; margin:0; letter-spacing:-0.02em;">
+                        Kas <span style="color:#6b705c; font-style:italic;">Event</span>
+                    </h1>
                 </div>
-                <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
+                <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
                     <a href="{{ route('panitia.kas.export', request()->only('jenis', 'divisi')) }}"
-                        style="padding:0.6rem 1.25rem; background:#e0decd; color:#002f45; border-radius:0.6rem; text-decoration:none; font-size:0.875rem; font-weight:600; border:2px solid #bdd1d3;">
+                        style="padding:0.8rem 1.5rem; background: rgba(255, 255, 255, 0.3); color:#002f45; border-radius:1rem; text-decoration:none; font-size:0.875rem; font-weight:700; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.4); transition: 0.3s;">
                         ⬇ Export Excel
                     </a>
                     @if (auth()->user()->role === 'bendahara' || auth()->user()->role === 'admin')
                         <button onclick="toggleForm()"
-                            style="padding:0.6rem 1.25rem; background:#002f45; color:#d2c296; border-radius:0.6rem; border:none; cursor:pointer; font-size:0.875rem; font-weight:700;">
+                            style="padding:0.8rem 1.5rem; background:#002f45; color:#d2c296; border-radius:1rem; border:none; cursor:pointer; font-size:0.875rem; font-weight:700; box-shadow: 0 10px 15px rgba(0,0,0,0.1);">
                             + Tambah Transaksi
                         </button>
                     @endif
                 </div>
             </div>
 
-            {{-- Flash Messages --}}
-            @if (session('success'))
-                <div
-                    style="padding:0.875rem 1rem; background:#dcfce7; border:1px solid #86efac; border-radius:0.75rem; color:#166534; margin-bottom:1.5rem; font-size:0.875rem;">
-                    ✅ {{ session('success') }}
-                </div>
-            @endif
-            @if ($errors->any())
-                <div
-                    style="padding:0.875rem 1rem; background:#fee2e2; border:1px solid #fca5a5; border-radius:0.75rem; color:#991b1b; margin-bottom:1.5rem; font-size:0.875rem;">
-                    @foreach ($errors->all() as $e)
-                        <p>{{ $e }}</p>
-                    @endforeach
-                </div>
-            @endif
-
-            {{-- Summary Cards (Ditambah class summary-grid-mobile) --}}
-            <div class="summary-grid-mobile"
-                style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2rem;">
-                <div style="background:#002f45; border-radius:1.25rem; padding:1.5rem; position:relative; overflow:hidden;">
-                    <div style="position:absolute; top:-1rem; right:-1rem; font-size:5rem; opacity:0.07;"></div>
-                    <div
-                        style="color:#bdd1d3; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem;">
-                        Saldo Saat Ini</div>
-                    <div
-                        style="color:{{ $saldoAkhir >= 0 ? '#d2c296' : '#fca5a5' }}; font-size:1.75rem; font-weight:800; font-family:'Playfair Display',serif;">
+            {{-- Summary Cards --}}
+            <div class="summary-grid-mobile" style="display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:2.5rem;">
+                {{-- Saldo Card --}}
+                <div class="glass-card" style="padding:1.5rem; background: rgba(0, 47, 69, 0.85);">
+                    <div style="color:#d2c296; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:0.5rem; font-weight:700;">Saldo Saat Ini</div>
+                    <div style="color:white; font-size:2rem; font-weight:800; font-family:'Playfair Display',serif;">
                         Rp {{ number_format($saldoAkhir, 0, ',', '.') }}
                     </div>
-                    <div style="color:#bdd1d3; font-size:0.75rem; margin-top:0.5rem; opacity:0.7;">Total saldo berjalan
-                    </div>
                 </div>
-                <div
-                    style="background:white; border-radius:1.25rem; padding:1.5rem; border:2px solid #86efac; position:relative; overflow:hidden;">
-                    <div style="position:absolute; top:-1rem; right:-1rem; font-size:5rem; opacity:0.07;"></div>
-                    <div
-                        style="color:#166534; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem;">
-                        Total Pemasukan</div>
-                    <div style="color:#166534; font-size:1.5rem; font-weight:800;">
+
+                {{-- Pemasukan Card --}}
+                <div class="glass-card" style="padding:1.5rem; border-left: 5px solid #2f855a;">
+                    <div style="color:#2f855a; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:0.5rem; font-weight:700;">Total Pemasukan</div>
+                    <div style="color:#002f45; font-size:1.75rem; font-weight:800;">
                         Rp {{ number_format($totalMasuk, 0, ',', '.') }}
                     </div>
-                    <div style="color:#166534; font-size:0.75rem; margin-top:0.5rem; opacity:0.7;">
-                        {{ \App\Models\KasTransaksi::where('jenis', 'masuk')->count() }} transaksi masuk
-                    </div>
                 </div>
-                <div
-                    style="background:white; border-radius:1.25rem; padding:1.5rem; border:2px solid #fca5a5; position:relative; overflow:hidden;">
-                    <div style="position:absolute; top:-1rem; right:-1rem; font-size:5rem; opacity:0.07;"></div>
-                    <div
-                        style="color:#991b1b; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem;">
-                        Total Pengeluaran</div>
-                    <div style="color:#991b1b; font-size:1.5rem; font-weight:800;">
+
+                {{-- Pengeluaran Card --}}
+                <div class="glass-card" style="padding:1.5rem; border-left: 5px solid #c53030;">
+                    <div style="color:#c53030; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:0.5rem; font-weight:700;">Total Pengeluaran</div>
+                    <div style="color:#002f45; font-size:1.75rem; font-weight:800;">
                         Rp {{ number_format($totalKeluar, 0, ',', '.') }}
-                    </div>
-                    <div style="color:#991b1b; font-size:0.75rem; margin-top:0.5rem; opacity:0.7;">
-                        {{ \App\Models\KasTransaksi::where('jenis', 'keluar')->count() }} transaksi keluar
                     </div>
                 </div>
             </div>
 
-            {{-- Form Tambah Transaksi --}}
-            <div id="form-transaksi" style="display:none; margin-bottom:2rem;">
-                <div style="background:white; border-radius:1.25rem; padding:2rem; border:2px solid #bdd1d3;">
-                    <h3
-                        style="color:#002f45; font-weight:700; font-size:1rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem;">
-                        📝 Form Input Transaksi
-                        <button onclick="toggleForm()"
-                            style="margin-left:auto; background:none; border:none; color:#002f45; opacity:0.4; cursor:pointer; font-size:1.25rem; line-height:1;">×</button>
-                    </h3>
+            {{-- Form Tambah Transaksi (Glass Style) --}}
+            <div id="form-transaksi" style="display:none; margin-bottom:2.5rem;">
+                <div class="glass-card" style="padding:2.5rem; background: rgba(255, 255, 255, 0.4);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+                        <h3 style="color:#002f45; font-weight:800; font-size:1.25rem; margin:0;">📝 Input Transaksi Baru</h3>
+                        <button onclick="toggleForm()" style="background:rgba(0,0,0,0.1); border:none; width:30px; height:30px; border-radius:50%; cursor:pointer;">×</button>
+                    </div>
 
                     <form method="POST" action="{{ route('panitia.kas.store') }}" enctype="multipart/form-data">
                         @csrf
-                        <div class="form-grid-mobile"
-                            style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin-bottom:1rem;">
-                            {{-- Tanggal --}}
+                        <div class="form-grid-mobile" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
                             <div>
-                                <label
-                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Tanggal
-                                    *</label>
-                                <input type="date" name="tanggal" value="{{ old('tanggal', date('Y-m-d')) }}" required
-                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.875rem; color:#002f45; box-sizing:border-box; outline:none;">
+                                <label style="display:block; font-size:0.75rem; font-weight:800; color:#002f45; margin-bottom:0.5rem; text-transform:uppercase;">Tanggal</label>
+                                <input type="date" name="tanggal" value="{{ old('tanggal', date('Y-m-d')) }}" required style="width:100%; padding:0.8rem; border:1px solid rgba(0,0,0,0.1); border-radius:0.75rem; background:rgba(255,255,255,0.5);">
                             </div>
-
-                            {{-- Jenis --}}
                             <div>
-                                <label
-                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Jenis
-                                    *</label>
-                                <select name="jenis" id="jenis-select" required onchange="handleJenisChange(this.value)"
-                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.875rem; color:#002f45; background:white; outline:none; box-sizing:border-box;">
+                                <label style="display:block; font-size:0.75rem; font-weight:800; color:#002f45; margin-bottom:0.5rem; text-transform:uppercase;">Jenis</label>
+                                <select name="jenis" id="jenis-select" required onchange="handleJenisChange(this.value)" style="width:100%; padding:0.8rem; border:1px solid rgba(0,0,0,0.1); border-radius:0.75rem; background:rgba(255,255,255,0.5);">
                                     <option value="">-- Pilih --</option>
-                                    <option value="masuk" {{ old('jenis') === 'masuk' ? 'selected' : '' }}>⬆ Uang Masuk
-                                    </option>
-                                    <option value="keluar" {{ old('jenis') === 'keluar' ? 'selected' : '' }}>⬇ Uang Keluar
-                                    </option>
+                                    <option value="masuk">⬆ Uang Masuk</option>
+                                    <option value="keluar">⬇ Uang Keluar</option>
                                 </select>
                             </div>
-
-                            {{-- Nominal --}}
                             <div>
-                                <label
-                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Nominal
-                                    (Rp) *</label>
-                                <input type="number" name="nominal" value="{{ old('nominal') }}" min="1" required
-                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.875rem; color:#002f45; box-sizing:border-box; outline:none;">
+                                <label style="display:block; font-size:0.75rem; font-weight:800; color:#002f45; margin-bottom:0.5rem; text-transform:uppercase;">Nominal (Rp)</label>
+                                <input type="number" name="nominal" required style="width:100%; padding:0.8rem; border:1px solid rgba(0,0,0,0.1); border-radius:0.75rem; background:rgba(255,255,255,0.5);">
                             </div>
                         </div>
 
-                        <div class="form-grid-mobile"
-                            style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
-                            {{-- Divisi --}}
+                        <div class="form-grid-mobile" style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
                             <div id="divisi-section" style="display:none;">
-                                <label
-                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Divisi
-                                    *</label>
-                                <select name="divisi" id="divisi-select"
-                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.875rem; color:#002f45; background:white; outline:none; box-sizing:border-box;">
+                                <label style="display:block; font-size:0.75rem; font-weight:800; color:#002f45; margin-bottom:0.5rem; text-transform:uppercase;">Divisi</label>
+                                <select name="divisi" id="divisi-select" style="width:100%; padding:0.8rem; border:1px solid rgba(0,0,0,0.1); border-radius:0.75rem; background:rgba(255,255,255,0.5);">
                                     <option value="">-- Pilih Divisi --</option>
                                     @foreach ($divisiList as $d)
-                                        <option value="{{ $d }}" {{ old('divisi') === $d ? 'selected' : '' }}>
-                                            {{ $d }}</option>
+                                        <option value="{{ $d }}">{{ $d }}</option>
                                     @endforeach
                                 </select>
                             </div>
-
-                            {{-- PIC --}}
                             <div>
-                                <label
-                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">PIC
-                                    (Penanggung Jawab) *</label>
-                                <input type="text" name="pic" value="{{ old('pic') }}" required
-                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.875rem; color:#002f45; box-sizing:border-box; outline:none;">
+                                <label style="display:block; font-size:0.75rem; font-weight:800; color:#002f45; margin-bottom:0.5rem; text-transform:uppercase;">PIC</label>
+                                <input type="text" name="pic" required style="width:100%; padding:0.8rem; border:1px solid rgba(0,0,0,0.1); border-radius:0.75rem; background:rgba(255,255,255,0.5);">
                             </div>
                         </div>
 
-                        <div style="margin-bottom:1rem;">
-                            <label
-                                style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Keterangan
-                                *</label>
-                            <textarea name="keterangan" required rows="2"
-                                style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.875rem; color:#002f45; box-sizing:border-box; outline:none; resize:vertical; font-family:inherit;">{{ old('keterangan') }}</textarea>
-                        </div>
-
-                        {{-- Bukti Transaksi --}}
                         <div style="margin-bottom:1.5rem;">
-                            <label
-                                style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Bukti
-                                Transaksi</label>
-                            <label for="bukti-upload"
-                                style="display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1rem; border:2px dashed #bdd1d3; border-radius:0.6rem; cursor:pointer; background:#f9f8f6;">
-                                <span style="font-size:1.5rem;">📎</span>
-                                <span style="color:#002f45; font-size:0.8rem;" id="bukti-label">Klik untuk upload
-                                    bukti</span>
-                                <input type="file" id="bukti-upload" name="bukti_file" accept=".jpg,.jpeg,.png,.pdf"
-                                    style="display:none;"
-                                    onchange="document.getElementById('bukti-label').textContent = this.files[0]?.name || 'Klik untuk upload'">
-                            </label>
+                            <label style="display:block; font-size:0.75rem; font-weight:800; color:#002f45; margin-bottom:0.5rem; text-transform:uppercase;">Keterangan</label>
+                            <textarea name="keterangan" required rows="2" style="width:100%; padding:0.8rem; border:1px solid rgba(0,0,0,0.1); border-radius:0.75rem; background:rgba(255,255,255,0.5);"></textarea>
                         </div>
 
-                        <div style="display:flex; gap:0.75rem;">
-                            <button type="submit"
-                                style="flex:1; padding:0.875rem; background:#002f45; color:#d2c296; font-weight:700; border:none; border-radius:0.75rem; cursor:pointer; font-size:0.95rem;">💾
-                                Simpan Transaksi</button>
-                            <button type="button" onclick="toggleForm()"
-                                style="padding:0.875rem 1.5rem; background:transparent; color:#002f45; font-weight:600; border:2px solid #bdd1d3; border-radius:0.75rem; cursor:pointer; font-size:0.875rem;">Batal</button>
+                        <div style="margin-bottom:2rem;">
+                            <label style="display:block; font-size:0.75rem; font-weight:800; color:#002f45; margin-bottom:0.5rem; text-transform:uppercase;">Bukti Transaksi</label>
+                            <input type="file" name="bukti_file" style="font-size:0.8rem; color:#002f45;">
+                        </div>
+
+                        <div style="display:flex; gap:1rem;">
+                            <button type="submit" style="flex:2; padding:1rem; background:#002f45; color:white; border:none; border-radius:1rem; font-weight:700; cursor:pointer;">Simpan Transaksi</button>
+                            <button type="button" onclick="toggleForm()" style="flex:1; padding:1rem; background:rgba(0,0,0,0.05); color:#002f45; border:none; border-radius:1rem; font-weight:700; cursor:pointer;">Batal</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            {{-- Tabel Transaksi (Tetap pakai inline style kamu, cuma ditambah overflow-x agar tabel bisa digeser di HP) --}}
-            <div style="background:white; border-radius:1rem; overflow:hidden; border:1px solid #bdd1d3;">
-                <div style="overflow-x:auto;"> {{-- Bungkus tabel agar bisa discroll di HP --}}
-                    <table style="width:100%; border-collapse:collapse; min-width:900px;">
+            {{-- Table Transaksi (Glass Style) --}}
+            <div class="glass-card" style="overflow:hidden;">
+                <div style="background: rgba(0, 47, 69, 0.85); padding: 1.25rem 2rem; color: #d2c296; font-weight: 800; letter-spacing: 0.1em; font-size: 0.9rem;">
+                    RIWAYAT TRANSAKSI
+                </div>
+                <div style="overflow-x:auto;">
+                    <table style="width:100%; border-collapse:collapse; min-width:1000px;">
                         <thead>
-                            <tr style="background:#002f45;">
-                                <th
-                                    style="padding:0.75rem 1rem; text-align:left; color:#d2c296; font-size:0.75rem; font-weight:600; text-transform:uppercase; white-space:nowrap;">
-                                    No</th>
-                                <th
-                                    style="padding:0.75rem 1rem; text-align:left; color:#d2c296; font-size:0.75rem; font-weight:600; text-transform:uppercase; white-space:nowrap;">
-                                    Tanggal</th>
-                                <th
-                                    style="padding:0.75rem 1rem; text-align:left; color:#d2c296; font-size:0.75rem; font-weight:600; text-transform:uppercase;">
-                                    Jenis</th>
-                                <th
-                                    style="padding:0.75rem 1rem; text-align:right; color:#d2c296; font-size:0.75rem; font-weight:600; text-transform:uppercase; white-space:nowrap;">
-                                    Nominal (Rp)</th>
-                                <th
-                                    style="padding:0.75rem 1rem; text-align:left; color:#d2c296; font-size:0.75rem; font-weight:600; text-transform:uppercase;">
-                                    Divisi</th>
-                                <th
-                                    style="padding:0.75rem 1rem; text-align:left; color:#d2c296; font-size:0.75rem; font-weight:600; text-transform:uppercase;">
-                                    Keterangan</th>
-                                <th
-                                    style="padding:0.75rem 1rem; text-align:left; color:#d2c296; font-size:0.75rem; font-weight:600; text-transform:uppercase;">
-                                    PIC</th>
-                                <th
-                                    style="padding:0.75rem 1rem; text-align:right; color:#d2c296; font-size:0.75rem; font-weight:600; text-transform:uppercase; white-space:nowrap;">
-                                    Saldo (Rp)</th>
-                                <th
-                                    style="padding:0.75rem 1rem; text-align:center; color:#d2c296; font-size:0.75rem; font-weight:600; text-transform:uppercase;">
-                                    Bukti</th>
-                                <th
-                                    style="padding:0.75rem 1rem; text-align:center; color:#d2c296; font-size:0.75rem; font-weight:600; text-transform:uppercase;">
-                                    Aksi</th>
+                            <tr style="background: rgba(255, 255, 255, 0.15);">
+                                <th style="padding:1.25rem 1rem; text-align:left; color:#002f45; font-size:0.7rem; font-weight:800; text-transform:uppercase;">No</th>
+                                <th style="padding:1.25rem 1rem; text-align:left; color:#002f45; font-size:0.7rem; font-weight:800; text-transform:uppercase;">Tanggal</th>
+                                <th style="padding:1.25rem 1rem; text-align:left; color:#002f45; font-size:0.7rem; font-weight:800; text-transform:uppercase;">Jenis</th>
+                                <th style="padding:1.25rem 1rem; text-align:right; color:#002f45; font-size:0.7rem; font-weight:800; text-transform:uppercase;">Nominal</th>
+                                <th style="padding:1.25rem 1rem; text-align:left; color:#002f45; font-size:0.7rem; font-weight:800; text-transform:uppercase;">Divisi</th>
+                                <th style="padding:1.25rem 1rem; text-align:left; color:#002f45; font-size:0.7rem; font-weight:800; text-transform:uppercase;">Keterangan</th>
+                                <th style="padding:1.25rem 1rem; text-align:right; color:#002f45; font-size:0.7rem; font-weight:800; text-transform:uppercase;">Saldo</th>
+                                <th style="padding:1.25rem 1rem; text-align:center; color:#002f45; font-size:0.7rem; font-weight:800; text-transform:uppercase;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($transaksi as $i => $t)
-                                <tr
-                                    style="border-bottom:1px solid #e0decd; {{ $t->jenis === 'masuk' ? 'background:#f0fdf4;' : ($loop->even ? 'background:#fff5f5' : 'background:#fff8f8;') }}">
-                                    <td style="padding:0.75rem 1rem; color:#002f45; opacity:0.4; font-size:0.8rem;">
-                                        {{ $i + 1 }}</td>
-                                    <td style="padding:0.75rem 1rem; color:#002f45; font-size:0.8rem; white-space:nowrap;">
-                                        {{ $t->tanggal->format('d/m/Y') }}</td>
-                                    <td style="padding:0.75rem 1rem;">
-                                        <span
-                                            style="display:inline-block; padding:0.2rem 0.6rem; border-radius:999px; font-size:0.7rem; font-weight:700;
-                                {{ $t->jenis === 'masuk' ? 'background:#dcfce7; color:#166534;' : 'background:#fee2e2; color:#991b1b;' }}">
-                                            {{ $t->jenis === 'masuk' ? '⬆ MASUK' : '⬇ KELUAR' }}
+                                <tr style="border-bottom:1px solid rgba(0,0,0,0.05); transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background='transparent'">
+                                    <td style="padding:1.25rem 1rem; color:#002f45; opacity:0.6; font-family:monospace;">{{ $i + 1 }}</td>
+                                    <td style="padding:1.25rem 1rem; color:#002f45; font-size:0.85rem; font-weight:600;">{{ $t->tanggal->format('d/m/Y') }}</td>
+                                    <td style="padding:1.25rem 1rem;">
+                                        <span style="padding:0.3rem 0.6rem; border-radius:0.5rem; font-size:0.65rem; font-weight:800; {{ $t->jenis === 'masuk' ? 'background:rgba(198,246,213,0.7); color:#22543d;' : 'background:rgba(254,215,215,0.7); color:#822727;' }}">
+                                            {{ strtoupper($t->jenis) }}
                                         </span>
                                     </td>
-                                    <td
-                                        style="padding:0.75rem 1rem; color:{{ $t->jenis === 'masuk' ? '#166534' : '#991b1b' }}; font-weight:700; font-size:0.875rem; text-align:right; white-space:nowrap;">
-                                        {{ $t->jenis === 'masuk' ? '+' : '-' }}
-                                        {{ number_format($t->nominal, 0, ',', '.') }}
+                                    <td style="padding:1.25rem 1rem; text-align:right; font-weight:800; color:{{ $t->jenis === 'masuk' ? '#2f855a' : '#c53030' }};">
+                                        {{ $t->jenis === 'masuk' ? '+' : '-' }} {{ number_format($t->nominal, 0, ',', '.') }}
                                     </td>
-                                    <td style="padding:0.75rem 1rem; font-size:0.8rem;">
-                                        @if ($t->divisi)
-                                            <span
-                                                style="background:#e0decd; color:#002f45; padding:0.2rem 0.6rem; border-radius:999px; font-size:0.7rem; font-weight:600;">{{ $t->divisi }}</span>
-                                        @else
-                                            <span style="color:#002f45; opacity:0.3;">—</span>
-                                        @endif
-                                    </td>
-                                    <td style="padding:0.75rem 1rem; color:#002f45; font-size:0.8rem; max-width:200px;">
-                                        {{ $t->keterangan }}</td>
-                                    <td style="padding:0.75rem 1rem; color:#002f45; font-size:0.8rem;">{{ $t->pic }}
-                                    </td>
-                                    <td style="padding:0.75rem 1rem; text-align:right; white-space:nowrap;">
-                                        <span
-                                            style="font-weight:700; font-size:0.875rem; color:{{ $t->saldo_berjalan >= 0 ? '#166534' : '#991b1b' }};">
-                                            {{ number_format($t->saldo_berjalan, 0, ',', '.') }}
-                                        </span>
-                                    </td>
-                                    <td style="padding:0.75rem 1rem; text-align:center;">
-                                        @if ($t->bukti_file)
-                                            <a href="{{ Storage::url($t->bukti_file) }}" target="_blank"
-                                                style="color:#002f45; font-size:1.1rem; text-decoration:none;">📄</a>
-                                        @endif
-                                    </td>
-                                    <td style="padding:0.75rem 1rem; text-align:center;">
-                                        @if (auth()->user()->role === 'bendahara' || auth()->user()->role === 'admin')
-                                            <form method="POST" action="{{ route('panitia.kas.destroy', $t->id) }}"
-                                                style="display:inline;" onsubmit="return confirm('Hapus?')">
-                                                @csrf @method('DELETE')
-                                                <button type="submit"
-                                                    style="padding:0.3rem 0.75rem; background:#fee2e2; color:#991b1b; border:none; border-radius:0.4rem; cursor:pointer; font-size:0.75rem; font-weight:600;">Hapus</button>
-                                            </form>
-                                        @else
-                                            <span style="color:#ccc; font-size:0.75rem;">No Access</span>
-                                        @endif
+                                    <td style="padding:1.25rem 1rem; font-size:0.8rem; color:#002f45;">{{ $t->divisi ?? '-' }}</td>
+                                    <td style="padding:1.25rem 1rem; font-size:0.8rem; color:#002f45; max-width:200px;">{{ $t->keterangan }}</td>
+                                    <td style="padding:1.25rem 1rem; text-align:right; font-weight:700; color:#002f45; font-size:0.85rem;">{{ number_format($t->saldo_berjalan, 0, ',', '.') }}</td>
+                                    <td style="padding:1.25rem 1rem; text-align:center;">
+                                        <div style="display:flex; gap:0.5rem; justify-content:center;">
+                                            @if ($t->bukti_file)
+                                                <a href="{{ Storage::url($t->bukti_file) }}" target="_blank" style="text-decoration:none;">📄</a>
+                                            @endif
+                                            @if (auth()->user()->role === 'bendahara' || auth()->user()->role === 'admin')
+                                                <form method="POST" action="{{ route('panitia.kas.destroy', $t->id) }}" onsubmit="return confirm('Hapus transaksi?')">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" style="background:none; border:none; color:#c53030; cursor:pointer; font-weight:bold;">×</button>
+                                                </form>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -321,7 +192,6 @@
                     </table>
                 </div>
             </div>
-
         </div>
     </div>
 

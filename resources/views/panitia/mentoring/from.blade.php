@@ -1,234 +1,169 @@
 @extends('layouts.app')
 
 @section('content')
-    <div style="min-height:calc(100vh - 64px); padding:2rem 1.5rem; background-color:#e0decd;">
-        <div style="max-width:1200px; margin:0 auto;">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-            {{-- Ganti bagian header di view lama kamu dengan ini --}}
-            <div
-                style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+    {{-- Background Ambient --}}
+    <div style="min-height: 100vh; background: linear-gradient(135deg, #f8f9fa 0%, #e0decd 100%); padding: 4rem 1.5rem; font-family: 'Inter', sans-serif;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+
+            {{-- Header Section --}}
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem;">
                 <div>
-                    <a href="{{ route('panitia.index') }}"
-                        style="color:#002f45; opacity:0.5; text-decoration:none; font-size:0.875rem; display:block; margin-bottom:0.25rem;">←
-                        Kembali</a>
-                    <h1 style="font-family:'Playfair Display',serif; color:#002f45; font-size:1.75rem; font-weight:700;">📒
-                        Mentoring Kelompok</h1>
+                    <a href="{{ route('panitia.index') }}" style="color: #002f45; opacity: 0.5; text-decoration: none; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 0.5rem;">
+                        ← Kembali ke Dashboard
+                    </a>
+                    <h1 style="font-family:'Playfair Display',serif; color:#002f45; font-size:2.5rem; font-weight:800; margin:0; letter-spacing:-0.02em;">
+                        Mentoring <span style="color:#6b705c; font-style:italic;">Kelompok</span>
+                    </h1>
                 </div>
 
-                <div style="display:flex; gap:0.75rem;">
-                    {{-- TOMBOL BARU --}}
-                    <a href="{{ route('panitia.mentoring.rekap') }}"
-                        style="padding:0.6rem 1.25rem; background:#d2c296; color:#002f45; border-radius:0.6rem; text-decoration:none; font-size:0.875rem; font-weight:700; border:2px solid #002f45; box-shadow: 3px 3px 0px #002f45;">
-                        📊 Lihat Rekap Seluruh Kelompok
+                <div style="display: flex; gap: 0.75rem;">
+                    <a href="{{ route('panitia.mentoring.rekap') }}" class="glass-btn primary">
+                        📊 Rekap Seluruh Kelompok
                     </a>
                 </div>
             </div>
+
+            {{-- Breadcrumb / Kelompok Info --}}
             @if (isset($kelompok))
-                <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
-                    <a href="{{ route('panitia.mentoring.index') }}"
-                        style="padding:0.6rem 1.25rem; background:#e0decd; color:#002f45; border-radius:0.6rem; text-decoration:none; font-size:0.875rem; font-weight:600; border:2px solid #bdd1d3;">
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-bottom: 2rem;">
+                    <a href="{{ route('panitia.mentoring.index') }}" class="glass-btn secondary">
                         ← Ganti Kelompok
                     </a>
-                    <a href="{{ route('panitia.mentoring.export', $kelompok) }}"
-                        style="padding:0.6rem 1.25rem; background:#002f45; color:#d2c296; border-radius:0.6rem; text-decoration:none; font-size:0.875rem; font-weight:700;">
-                        ⬇ Export Rekap Excel
+                    <div style="padding: 0.6rem 1.25rem; background: rgba(0,47,69,0.9); color: #d2c296; border-radius: 0.75rem; font-size: 0.875rem; font-weight: 700;">
+                        Kelompok {{ $kelompok }}
+                    </div>
+                    <a href="{{ route('panitia.mentoring.export', $kelompok) }}" class="glass-btn success">
+                        ⬇ Export Excel
                     </a>
                 </div>
             @endif
-        </div>
 
-        {{-- Flash Messages --}}
-        @if (session('success'))
-            <div
-                style="padding:0.875rem 1rem; background:#dcfce7; border:1px solid #86efac; border-radius:0.75rem; color:#166534; margin-bottom:1.5rem; font-size:0.875rem;">
-                ✅ {{ session('success') }}
-            </div>
-        @endif
+            {{-- Flash Messages --}}
+            @if (session('success'))
+                <div class="glass-alert">
+                    ✅ {{ session('success') }}
+                </div>
+            @endif
 
-        {{-- KONDISI 1: JIKA KELOMPOK SUDAH DIPILIH --}}
-        @if (isset($kelompok))
-            {{-- Form Input --}}
-            @if (auth()->user()->role === 'bendahara' || auth()->user()->role === 'admin')
-                <div
-                    style="background:white; border-radius:1.25rem; padding:2rem; border:2px solid #bdd1d3; margin-bottom:2rem;">
-                    <h3
-                        style="color:#002f45; font-weight:700; font-size:1rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem;">
-                        📝 Catat Pertemuan Baru - Kelompok {{ $kelompok }}
-                    </h3>
-
-                    <form method="POST" action="{{ route('panitia.mentoring.store', $kelompok) }}">
-                        @csrf
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:2rem;">
-                            <div>
-                                <label
-                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Nama
-                                    Kegiatan/Materi *</label>
-                                <input type="text" name="nama_kegiatan" required placeholder="Misal: Adab Penuntut Ilmu"
-                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.875rem; color:#002f45; outline:none;">
+            {{-- KONDISI 1: JIKA KELOMPOK SUDAH DIPILIH --}}
+            @if (isset($kelompok))
+                
+                {{-- Form Input (Admin/Bendahara Only) --}}
+                @if (auth()->user()->isMentor())
+                    <div class="glass-card main-form">
+                        <h3 class="card-subtitle">📝 Catat Pertemuan Baru</h3>
+                        <form method="POST" action="{{ route('panitia.mentoring.store', $kelompok) }}">
+                            @csrf
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                                <div>
+                                    <label class="input-label">Nama Kegiatan / Materi *</label>
+                                    <input type="text" name="nama_kegiatan" required placeholder="Misal: Adab Penuntut Ilmu" class="glass-input">
+                                </div>
+                                <div>
+                                    <label class="input-label">Tanggal *</label>
+                                    <input type="date" name="tanggal" value="{{ date('Y-m-d') }}" required class="glass-input">
+                                </div>
                             </div>
-                            <div>
-                                <label
-                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Tanggal
-                                    *</label>
-                                <input type="date" name="tanggal" value="{{ date('Y-m-d') }}" required
-                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.875rem; color:#002f45; outline:none;">
-                            </div>
-                        </div>
 
-                        <div style="background:#f9f8f6; border-radius:1rem; padding:1.25rem; border:1px solid #e0decd;">
-                            <div
-                                style="font-size:0.75rem; color:#002f45; opacity:0.5; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1rem; font-weight:700;">
-                                Presensi Anggota</div>
-
-                            <div style="overflow-x:auto;">
-                                <table style="width:100%; border-collapse:collapse;">
+                            <div class="glass-table-container">
+                                <p class="table-intro">Presensi Anggota Kelompok {{ $kelompok }}</p>
+                                <table class="glass-table">
                                     <thead>
-                                        <tr style="border-bottom:2px solid #bdd1d3;">
-                                            <th style="padding:0.75rem; text-align:left; color:#002f45; font-size:0.75rem;">
-                                                NAMA PESERTA</th>
-                                            <th style="padding:0.75rem; text-align:left; color:#002f45; font-size:0.75rem;">
-                                                NIM</th>
-                                            <th
-                                                style="padding:0.75rem; text-align:left; color:#002f45; font-size:0.75rem; width:180px;">
-                                                KEHADIRAN</th>
-                                            <th style="padding:0.75rem; text-align:left; color:#002f45; font-size:0.75rem;">
-                                                CATATAN</th>
+                                        <tr>
+                                            <th>NAMA PESERTA</th>
+                                            <th>NIM</th>
+                                            <th style="width: 150px;">KEHADIRAN</th>
+                                            <th>CATATAN</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($peserta as $p)
-                                            <tr style="border-bottom:1px solid #e0decd;">
-                                                <td
-                                                    style="padding:1rem 0.75rem; color:#002f45; font-weight:600; font-size:0.875rem;">
-                                                    {{ $p->name }}</td>
-                                                <td
-                                                    style="padding:1rem 0.75rem; color:#002f45; opacity:0.6; font-size:0.8rem;">
-                                                    {{ $p->nim }}</td>
-                                                <td style="padding:1rem 0.75rem;">
-                                                    <select name="kehadiran[{{ $p->id }}]" required
-                                                        style="width:100%; padding:0.5rem; border:2px solid #bdd1d3; border-radius:0.5rem; font-size:0.8rem; background:white;">
+                                            <tr>
+                                                <td style="font-weight: 700;">{{ $p->name }}</td>
+                                                <td style="opacity: 0.6;">{{ $p->nim }}</td>
+                                                <td>
+                                                    <select name="kehadiran[{{ $p->id }}]" required class="glass-select">
                                                         <option value="Hadir">Hadir</option>
                                                         <option value="Izin">Izin</option>
                                                         <option value="Alpha">Alpha</option>
                                                     </select>
                                                 </td>
-                                                <td style="padding:1rem 0.75rem;">
-                                                    <input type="text" name="keterangan[{{ $p->id }}]"
-                                                        placeholder="Opsional..."
-                                                        style="width:100%; padding:0.5rem; border:1px solid #bdd1d3; border-radius:0.5rem; font-size:0.8rem;">
+                                                <td>
+                                                    <input type="text" name="keterangan[{{ $p->id }}]" placeholder="..." class="glass-input-sm">
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
 
-                        <div style="margin-top:1.5rem; display:flex; justify-content:flex-end;">
-                            <button type="submit"
-                                style="padding:0.875rem 2.5rem; background:#002f45; color:#d2c296; font-weight:700; border:none; border-radius:0.75rem; cursor:pointer; font-size:0.95rem;">
-                                💾 Simpan Laporan Mentoring
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            @else
-                {{-- Pesan untuk Panitia Biasa --}}
-                <div
-                    style="background:#f0fdf4; border-radius:1rem; padding:1.5rem; border:1px solid #bbf7d0; margin-bottom:2rem; color:#166534; font-size:0.875rem;">
-                    ℹ️ <strong>Mode Lihat:</strong> Anda dapat melihat riwayat mentoring kelompok ini, namun tidak memiliki
-                    akses untuk menambah atau mengubah data.
-                </div>
-            @endif
-
-            {{-- Riwayat Tabel --}}
-            {{-- Riwayat Tabel --}}
-            <h3
-                style="font-family:'Playfair Display',serif; color:#002f45; font-size:1.5rem; margin-top:3rem; margin-bottom:1.5rem;">
-                📜 Riwayat Detail Pertemuan</h3>
-
-            @forelse($mentorings as $men)
-                <div style="margin-bottom:2.5rem;">
-                    {{-- Nama Kegiatan & Aksi Global --}}
-                    <div
-                        style="background:#e0decd; padding:0.75rem 1.25rem; border-radius:0.75rem 0.75rem 0 0; border:2px solid #bdd1d3; border-bottom:none; display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <span style="font-weight:700; color:#002f45; font-size:1rem;">📌
-                                {{ $men->nama_kegiatan }}</span>
-                            <span
-                                style="color:#002f45; opacity:0.6; font-size:0.875rem; font-weight:600; margin-left:1rem;">📅
-                                {{ date('d F Y', strtotime($men->tanggal)) }}</span>
-                        </div>
-                        {{-- Tombol Hapus Seluruh Kegiatan --}}
-                        @if (auth()->user()->role === 'bendahara' || auth()->user()->role === 'admin')
-                            <form method="POST" action="{{ route('panitia.mentoring.destroy', $men->id) }}"
-                                onsubmit="return confirm('Hapus seluruh catatan kegiatan ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                    style="background:none; border:none; color:#991b1b; cursor:pointer; font-size:0.8rem; font-weight:700; display:flex; align-items:center; gap:0.25rem;">
-                                    🗑️ Hapus Kegiatan
+                            <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+                                <button type="submit" class="glass-btn submit-btn">
+                                    💾 Simpan Laporan Mentoring
                                 </button>
-                            </form>
-                        @endif
+                            </div>
+                        </form>
                     </div>
+                @else
+                    <div class="glass-alert info">
+                        ℹ️ <strong>Mode Lihat:</strong> Anda hanya dapat memantau riwayat mentoring kelompok ini.
+                    </div>
+                @endif
 
-                    <div style="background:white; border-radius:0 0 1rem 1rem; overflow:hidden; border:2px solid #bdd1d3;">
-                        <div style="overflow-x:auto;">
-                            <table style="width:100%; border-collapse:collapse; min-width:900px;">
+                {{-- Riwayat Tabel --}}
+                <h3 style="font-family:'Playfair Display',serif; color:#002f45; font-size:1.5rem; margin-top:4rem; margin-bottom:1.5rem;">
+                    📜 Riwayat Detail Pertemuan
+                </h3>
+
+                @forelse($mentorings as $men)
+                    <div class="glass-card history-card">
+                        <div class="history-header">
+                            <div>
+                                <span class="history-title">📌 {{ $men->nama_kegiatan }}</span>
+                                <span class="history-date">📅 {{ date('d M Y', strtotime($men->tanggal)) }}</span>
+                            </div>
+                            @if (auth()->user()->role === 'bendahara' || auth()->user()->role === 'admin')
+                                <form method="POST" action="{{ route('panitia.mentoring.destroy', $men->id) }}" onsubmit="return confirm('Hapus seluruh catatan kegiatan ini?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="delete-link">🗑️ Hapus</button>
+                                </form>
+                            @endif
+                        </div>
+
+                        <div class="glass-table-container no-bg">
+                            <table class="glass-table">
                                 <thead>
-                                    <tr style="background:#002f45;">
-                                        <th
-                                            style="padding:0.75rem 1rem; text-align:left; color:#d2c296; font-size:0.7rem; text-transform:uppercase;">
-                                            Nama</th>
-                                        <th
-                                            style="padding:0.75rem 1rem; text-align:left; color:#d2c296; font-size:0.7rem; text-transform:uppercase;">
-                                            NIM</th>
-                                        <th
-                                            style="padding:0.75rem 1rem; text-align:left; color:#d2c296; font-size:0.7rem; text-transform:uppercase;">
-                                            Gender</th>
-                                        <th
-                                            style="padding:0.75rem 1rem; text-align:left; color:#d2c296; font-size:0.7rem; text-transform:uppercase;">
-                                            Kehadiran</th>
-                                        <th
-                                            style="padding:0.75rem 1rem; text-align:left; color:#d2c296; font-size:0.7rem; text-transform:uppercase;">
-                                            Catatan</th>
-                                        <th
-                                            style="padding:0.75rem 1rem; text-align:center; color:#d2c296; font-size:0.7rem; text-transform:uppercase;">
-                                            Aksi</th>
+                                    <tr>
+                                        <th>Nama</th>
+                                        <th>NIM</th>
+                                        <th>Gender</th>
+                                        <th>Kehadiran</th>
+                                        <th>Catatan</th>
+                                        <th style="text-align: center;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($men->details as $det)
-                                        <tr
-                                            style="border-bottom:1px solid #e0decd; background:{{ $loop->even ? '#f9f8f6' : 'white' }};">
-                                            <td
-                                                style="padding:0.875rem 1rem; color:#002f45; font-weight:600; font-size:0.875rem;">
-                                                {{ $det->peserta->name ?? 'User Terhapus' }}</td>
-                                            <td
-                                                style="padding:0.875rem 1rem; color:#002f45; opacity:0.7; font-size:0.8rem;">
-                                                {{ $det->peserta->nim ?? '-' }}</td>
-                                            <td style="padding:0.875rem 1rem; color:#002f45; font-size:0.8rem;">
-                                                {{ $det->peserta->gender ?? '-' }}</td>
-                                            <td style="padding:0.875rem 1rem;">
-                                                <span id="status-text-{{ $det->id }}"
-                                                    style="display:inline-block; padding:0.25rem 0.6rem; border-radius:0.5rem; font-size:0.7rem; font-weight:800;
-                                        {{ $det->kehadiran === 'Hadir' ? 'background:#dcfce7; color:#166534;' : ($det->kehadiran === 'Izin' ? 'background:#fff7ed; color:#9a3412;' : 'background:#fee2e2; color:#991b1b;') }}">
+                                        <tr>
+                                            <td style="font-weight: 600;">{{ $det->peserta->name ?? 'User Terhapus' }}</td>
+                                            <td style="font-size: 0.75rem; opacity: 0.7;">{{ $det->peserta->nim ?? '-' }}</td>
+                                            <td style="font-size: 0.75rem;">{{ $det->peserta->gender ?? '-' }}</td>
+                                            <td>
+                                                <span class="badge-status {{ strtolower($det->kehadiran) }}">
                                                     {{ strtoupper($det->kehadiran) }}
                                                 </span>
                                             </td>
-                                            <td
-                                                style="padding:0.875rem 1rem; color:#002f45; font-size:0.8rem; font-style:italic; opacity:0.8;">
-                                                {{ $det->keterangan ?? '—' }}
-                                            </td>
-                                            <td style="padding:0.875rem 1rem; text-align:center;">
+                                            <td style="font-style: italic; font-size: 0.8rem; opacity: 0.7;">{{ $det->keterangan ?? '—' }}</td>
+                                            <td style="text-align: center;">
                                                 @if (auth()->user()->role === 'bendahara' || auth()->user()->role === 'admin')
-                                                    <button
-                                                        onclick="openEditModal('{{ $det->id }}', '{{ $det->kehadiran }}', '{{ $det->keterangan }}')"
-                                                        style="background:#e0decd; border:1px solid #bdd1d3; border-radius:0.4rem; padding:0.3rem 0.6rem; cursor:pointer; font-size:0.75rem; color:#002f45; font-weight:700;">
+                                                    <button onclick="openEditModal('{{ $det->id }}', '{{ $det->kehadiran }}', '{{ $det->keterangan }}')" class="edit-mini-btn">
                                                         ✏️ Edit
                                                     </button>
-                                                @endif <span style="color:#ccc; font-size:0.75rem;">No Access</span>
+                                                @else
+                                                    <span style="font-size: 0.7rem; opacity: 0.3;">🔒</span>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -236,111 +171,136 @@
                             </table>
                         </div>
                     </div>
-                </div>
-            @empty
-                <div
-                    style="background:white; border-radius:1rem; padding:3rem; text-align:center; border:2px dashed #bdd1d3;">
-                    <p style="color:#002f45; opacity:0.5;">Belum ada riwayat mentoring untuk kelompok ini.</p>
-                </div>
-            @endforelse
-
-            {{-- MODAL EDIT SEDERHANA (Taruh di paling bawah sebelum @endsection) --}}
-            <div id="editModal"
-                style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,47,69,0.8); z-index:9999; align-items:center; justify-content:center;">
-                <div
-                    style="background:white; padding:2rem; border-radius:1.25rem; width:100%; max-width:400px; border:2px solid #d2c296;">
-                    <h3 style="font-family:'Playfair Display',serif; color:#002f45; margin-bottom:1.5rem;">Update
-                        Kehadiran</h3>
-                    <form id="editForm" method="POST" action="">
-                        @csrf
-                        @method('PUT')
-                        <div style="margin-bottom:1rem;">
-                            <label
-                                style="display:block; font-size:0.75rem; font-weight:700; color:#002f45; margin-bottom:0.5rem;">STATUS
-                                KEHADIRAN</label>
-                            <select name="kehadiran" id="modalKehadiran"
-                                style="width:100%; padding:0.75rem; border:2px solid #bdd1d3; border-radius:0.6rem;">
-                                <option value="Hadir">Hadir</option>
-                                <option value="Izin">Izin</option>
-                                <option value="Alpha">Alpha</option>
-                            </select>
-                        </div>
-                        <div style="margin-bottom:1.5rem;">
-                            <label
-                                style="display:block; font-size:0.75rem; font-weight:700; color:#002f45; margin-bottom:0.5rem;">CATATAN</label>
-                            <input type="text" name="keterangan" id="modalKeterangan"
-                                style="width:100%; padding:0.75rem; border:2px solid #bdd1d3; border-radius:0.6rem;">
-                        </div>
-                        <div style="display:flex; gap:0.75rem;">
-                            <button type="submit"
-                                style="flex:1; padding:0.75rem; background:#002f45; color:#d2c296; border:none; border-radius:0.6rem; font-weight:700; cursor:pointer;">Simpan
-                                Perubahan</button>
-                            <button type="button" onclick="closeEditModal()"
-                                style="padding:0.75rem; background:#f9f8f6; border:2px solid #bdd1d3; border-radius:0.6rem; cursor:pointer;">Batal</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <script>
-                function openEditModal(id, kehadiran, keterangan) {
-                    const modal = document.getElementById('editModal');
-                    const form = document.getElementById('editForm');
-
-                    // Set URL action secara dinamis (sesuaikan dengan nama route kamu)
-                    form.action = `/panitia/mentoring/detail/${id}`;
-
-                    document.getElementById('modalKehadiran').value = kehadiran;
-                    document.getElementById('modalKeterangan').value = keterangan === '—' ? '' : keterangan;
-
-                    modal.style.display = 'flex';
-                }
-
-                function closeEditModal() {
-                    document.getElementById('editModal').style.display = 'none';
-                }
-            </script>
-
-            {{-- KONDISI 2: JIKA BELUM PILIH KELOMPOK --}}
-        @else
-            <div
-                style="background:#002f45; border-radius:1.5rem; padding:3rem; text-align:center; margin-bottom:2rem; position:relative; overflow:hidden;">
-                <div style="position:absolute; top:-2rem; right:-2rem; font-size:10rem; opacity:0.05;">👥</div>
-                <h2 style="font-family:'Playfair Display',serif; color:#d2c296; font-size:2rem; margin-bottom:0.5rem;">
-                    Pilih Kelompok Mentoring</h2>
-                <p style="color:#bdd1d3; opacity:0.7; font-size:1rem;">Silakan pilih kelompok untuk melakukan absensi
-                </p>
-            </div>
-
-            <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:1.5rem;">
-                @forelse($listKelompok as $k)
-                    <a href="{{ route('panitia.mentoring.kelompok', $k) }}"
-                        style="text-decoration:none; transition:transform 0.2s;"
-                        onmouseover="this.style.transform='translateY(-5px)'"
-                        onmouseout="this.style.transform='translateY(0)'">
-                        <div
-                            style="background:white; border-radius:1.25rem; padding:2rem; border:2px solid #bdd1d3; text-align:center;">
-                            <div
-                                style="color:#002f45; opacity:0.4; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem;">
-                                Kelompok</div>
-                            <div
-                                style="font-family:'Playfair Display',serif; color:#002f45; font-size:3rem; font-weight:800;">
-                                {{ $k }}</div>
-                            <div
-                                style="margin-top:1rem; display:inline-block; padding:0.5rem 1.5rem; background:#e0decd; color:#002f45; border-radius:0.6rem; font-size:0.875rem; font-weight:700;">
-                                Buka Presensi →
-                            </div>
-                        </div>
-                    </a>
                 @empty
-                    <div
-                        style="grid-column:1/-1; background:white; border-radius:1rem; padding:3rem; text-align:center; border:2px dashed #bdd1d3;">
-                        <p style="color:#002f45; opacity:0.5;">Belum ada data kelompok peserta terdaftar.</p>
+                    <div class="glass-card empty-state">
+                        <p>Belum ada riwayat mentoring untuk kelompok ini.</p>
                     </div>
                 @endforelse
-            </div>
-        @endif
 
+            {{-- KONDISI 2: PILIH KELOMPOK --}}
+            @else
+                <div class="glass-card hero-selection">
+                    <div class="hero-icon">👥</div>
+                    <h2 class="hero-title">Pilih Kelompok Mentoring</h2>
+                    <p class="hero-desc">Silakan pilih kelompok untuk mengelola data kehadiran.</p>
+                </div>
+
+                <div class="selection-grid">
+                    @forelse($listKelompok as $k)
+                        <a href="{{ route('panitia.mentoring.kelompok', $k) }}" class="group-card">
+                            <span class="group-label">Kelompok</span>
+                            <span class="group-number">{{ $k }}</span>
+                            <div class="group-btn">Buka Presensi →</div>
+                        </a>
+                    @empty
+                        <div class="glass-card empty-state" style="grid-column: 1/-1;">
+                            <p>Belum ada data kelompok peserta terdaftar.</p>
+                        </div>
+                    @endforelse
+                </div>
+            @endif
+
+        </div>
     </div>
+
+    {{-- MODAL EDIT GLASS --}}
+    <div id="editModal" class="glass-modal-overlay">
+        <div class="glass-card modal-content">
+            <h3 class="card-subtitle">Update Kehadiran</h3>
+            <form id="editForm" method="POST" action="">
+                @csrf @method('PUT')
+                <div style="margin-bottom:1.5rem;">
+                    <label class="input-label">Status Kehadiran</label>
+                    <select name="kehadiran" id="modalKehadiran" class="glass-input">
+                        <option value="Hadir">Hadir</option>
+                        <option value="Izin">Izin</option>
+                        <option value="Alpha">Alpha</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:2rem;">
+                    <label class="input-label">Catatan</label>
+                    <input type="text" name="keterangan" id="modalKeterangan" class="glass-input">
+                </div>
+                <div style="display:flex; gap:0.75rem;">
+                    <button type="submit" class="glass-btn submit-btn" style="flex:1;">Simpan</button>
+                    <button type="button" onclick="closeEditModal()" class="glass-btn secondary">Batal</button>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <style>
+        /* Base Glass Styles */
+        .glass-card { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 2rem; padding: 2rem; }
+        .card-subtitle { color: #002f45; font-weight: 800; font-size: 1.1rem; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        /* Form Elements */
+        .input-label { display: block; font-size: 0.7rem; font-weight: 700; color: #002f45; opacity: 0.6; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .glass-input { width: 100%; background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(0, 47, 69, 0.1); padding: 0.75rem 1rem; border-radius: 1rem; color: #002f45; outline: none; }
+        .glass-input:focus { border-color: #002f45; background: white; }
+        .glass-input-sm { width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(0, 47, 69, 0.1); font-size: 0.8rem; padding: 0.25rem; outline: none; }
+        .glass-select { background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(0, 47, 69, 0.1); padding: 0.4rem; border-radius: 0.75rem; font-size: 0.8rem; font-weight: 700; color: #002f45; }
+
+        /* Buttons */
+        .glass-btn { text-decoration: none; padding: 0.7rem 1.5rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 700; transition: 0.3s; border: none; cursor: pointer; display: inline-flex; align-items: center; }
+        .glass-btn.primary { background: #002f45; color: #d2c296; }
+        .glass-btn.secondary { background: rgba(255, 255, 255, 0.5); color: #002f45; }
+        .glass-btn.success { background: #6b705c; color: white; }
+        .glass-btn.submit-btn { background: #002f45; color: white; box-shadow: 0 10px 20px rgba(0,47,69,0.2); }
+        .glass-btn:hover { transform: translateY(-3px); opacity: 0.9; }
+
+        /* Tables */
+        .glass-table-container { background: rgba(255, 255, 255, 0.3); border-radius: 1.5rem; padding: 1.5rem; overflow-x: auto; }
+        .glass-table-container.no-bg { background: transparent; padding: 0; }
+        .table-intro { font-size: 0.75rem; font-weight: 800; color: #002f45; opacity: 0.5; margin-bottom: 1rem; text-transform: uppercase; }
+        .glass-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        .glass-table th { text-align: left; font-size: 0.65rem; color: #002f45; opacity: 0.5; padding: 1rem; border-bottom: 2px solid rgba(0, 47, 69, 0.05); }
+        .glass-table td { padding: 1rem; font-size: 0.85rem; color: #002f45; border-bottom: 1px solid rgba(0, 47, 69, 0.03); }
+
+        /* Badges */
+        .badge-status { padding: 0.25rem 0.6rem; border-radius: 0.5rem; font-size: 0.65rem; font-weight: 800; }
+        .badge-status.hadir { background: #dcfce7; color: #166534; }
+        .badge-status.izin { background: #fff7ed; color: #9a3412; }
+        .badge-status.alpha { background: #fee2e2; color: #991b1b; }
+
+        /* History & Selection Grid */
+        .history-card { margin-bottom: 2rem; }
+        .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .history-title { font-weight: 800; color: #002f45; font-size: 1rem; }
+        .history-date { font-size: 0.8rem; font-weight: 600; opacity: 0.5; margin-left: 1rem; }
+        .delete-link { background: none; border: none; color: #991b1b; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+        .edit-mini-btn { background: rgba(0,47,69,0.05); border: none; padding: 0.3rem 0.6rem; border-radius: 0.5rem; font-size: 0.75rem; color: #002f45; font-weight: 700; cursor: pointer; }
+
+        .selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; }
+        .group-card { text-decoration: none; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); border: 1px solid white; border-radius: 2rem; padding: 2.5rem; text-align: center; transition: 0.3s; }
+        .group-card:hover { transform: translateY(-10px); background: white; box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+        .group-label { display: block; font-size: 0.75rem; font-weight: 700; color: #002f45; opacity: 0.4; text-transform: uppercase; letter-spacing: 0.1em; }
+        .group-number { display: block; font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 900; color: #002f45; margin: 0.5rem 0; }
+        .group-btn { display: inline-block; padding: 0.5rem 1.25rem; background: #e0decd; color: #002f45; border-radius: 0.75rem; font-size: 0.75rem; font-weight: 800; }
+
+        /* Modal */
+        .glass-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 47, 69, 0.6); backdrop-filter: blur(5px); z-index: 9999; align-items: center; justify-content: center; }
+        .modal-content { width: 100%; max-width: 400px; background: white; }
+
+        .glass-alert { padding: 1rem 1.5rem; background: rgba(220, 252, 231, 0.6); border: 1px solid #86efac; border-radius: 1rem; color: #166534; margin-bottom: 2rem; font-weight: 600; font-size: 0.9rem; }
+        .hero-selection { text-align: center; padding: 4rem 2rem; margin-bottom: 3rem; background: rgba(0, 47, 69, 0.9); }
+        .hero-icon { font-size: 5rem; opacity: 0.1; position: absolute; right: 2rem; top: 1rem; }
+        .hero-title { font-family: 'Playfair Display', serif; color: #d2c296; font-size: 2.2rem; margin-bottom: 0.5rem; }
+        .hero-desc { color: #bdd1d3; opacity: 0.8; }
+    </style>
+
+    <script>
+        function openEditModal(id, kehadiran, keterangan) {
+            const modal = document.getElementById('editModal');
+            const form = document.getElementById('editForm');
+            form.action = `/panitia/mentoring/detail/${id}`; // Sesuaikan URL Route
+            document.getElementById('modalKehadiran').value = kehadiran;
+            document.getElementById('modalKeterangan').value = keterangan === '—' ? '' : keterangan;
+            modal.style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+    </script>
 @endsection

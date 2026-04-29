@@ -1,148 +1,144 @@
 @extends('layouts.app')
 
 @section('content')
-    <div style="min-height:calc(100vh - 64px); padding:2rem 1.5rem;">
+    {{-- Background Ambient --}}
+    <div style="min-height: 100vh; background: linear-gradient(135deg, #f8f9fa 0%, #e0decd 100%); padding: 3rem 1.5rem;">
         <div style="max-width:900px; margin:0 auto;">
 
             {{-- Header --}}
             <div
-                style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+                style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:2.5rem; flex-wrap:wrap; gap:1.5rem;">
                 <div>
                     <a href="{{ route('panitia.index') }}"
-                        style="color:#002f45; opacity:0.5; text-decoration:none; font-size:0.875rem; display:block; margin-bottom:1.5rem;">
-                        ← Kembali</a>
-                    <h1 style="font-family:'Playfair Display',serif; color:#002f45; font-size:1.75rem; font-weight:700;">📚
-                        Kelola Tugas</h1>
-                    <p style="color:#002f45; opacity:0.5; font-size:0.875rem;">Buat dan kelola jenis tugas yang harus
-                        dikumpulkan peserta</p>
+                        style="color:#002f45; opacity:0.5; text-decoration:none; font-size:0.875rem; display:flex; align-items:center; gap:0.5rem; margin-bottom:1rem; font-weight:600;">
+                        <span style="font-size:1.1rem;">←</span> Kembali</a>
+                    <h1
+                        style="font-family:'Playfair Display',serif; color:#002f45; font-size:2.5rem; font-weight:800; margin:0; letter-spacing:-0.02em;">
+                        Kelola <span style="color:#6b705c; font-style:italic;">Tugas</span>
+                    </h1>
+                    <p style="color:#002f45; opacity:0.6; font-size:0.95rem; margin-top:0.5rem;">Buat dan kelola jenis tugas
+                        yang harus dikumpulkan peserta</p>
                 </div>
-                <div style="display:flex; gap:0.75rem;">
+                <div style="display:flex; gap:0.75rem; align-items: center;">
                     <a href="{{ route('panitia.tugas.rekap') }}"
-                        style="padding:0.6rem 1.25rem; background:#e0decd; color:#002f45; border-radius:0.6rem; text-decoration:none; font-size:0.875rem; font-weight:600; border:2px solid #bdd1d3;">
+                        style="padding:0.75rem 1.5rem; background:rgba(255,255,255,0.5); backdrop-filter:blur(10px); color:#002f45; border-radius:0.75rem; text-decoration:none; font-size:0.875rem; font-weight:700; border:1px solid rgba(189,209,211,0.6); transition:all 0.3s ease;">
                         📊 Lihat Rekap
                     </a>
                     @if (auth()->user()->isAcara())
                         <button onclick="toggleForm()"
-                            style="padding:0.6rem 1.25rem; background:#002f45; color:#d2c296; border-radius:0.6rem; border:none; cursor:pointer; font-size:0.875rem; font-weight:700;">
+                            style="padding:0.75rem 1.5rem; background:#002f45; color:#d2c296; border-radius:0.75rem; border:none; cursor:pointer; font-size:0.875rem; font-weight:700; box-shadow:0 10px 20px rgba(0,47,69,0.2); transition:all 0.3s ease;"
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 15px 25px rgba(0,47,69,0.3)';"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 20px rgba(0,47,69,0.2)';">
                             + Buat Tugas Baru
                         </button>
                     @endif
                 </div>
             </div>
 
-            {{-- Flash --}}
+            {{-- Flash Messages --}}
             @if (session('success'))
                 <div
-                    style="padding:0.875rem 1rem; background:#dcfce7; border:1px solid #86efac; border-radius:0.75rem; color:#166534; margin-bottom:1.5rem; font-size:0.875rem;">
+                    style="padding:1rem; background:rgba(220,252,231,0.7); backdrop-filter:blur(10px); border:1px solid #86efac; border-radius:1rem; color:#166534; margin-bottom:1.5rem; font-size:0.875rem; display:flex; align-items:center; gap:0.5rem;">
                     ✅ {{ session('success') }}
                 </div>
             @endif
             @if ($errors->any())
                 <div
-                    style="padding:0.875rem 1rem; background:#fee2e2; border:1px solid #fca5a5; border-radius:0.75rem; color:#991b1b; margin-bottom:1.5rem; font-size:0.875rem;">
+                    style="padding:1rem; background:rgba(254,226,226,0.7); backdrop-filter:blur(10px); border:1px solid #fca5a5; border-radius:1rem; color:#991b1b; margin-bottom:1.5rem; font-size:0.875rem;">
                     @foreach ($errors->all() as $e)
-                        <p>{{ $e }}</p>
+                        <p style="margin:0.25rem 0;">⚠️ {{ $e }}</p>
                     @endforeach
                 </div>
             @endif
 
-            {{-- Form Buat Tugas --}}
-            <div id="form-tugas" style="display:none; margin-bottom:2rem;">
-                <div style="background:white; border-radius:1.25rem; padding:2rem; border:2px solid #bdd1d3;">
+            {{-- Form Buat Tugas (Glass Style) --}}
+            <div id="form-tugas" style="display:none; margin-bottom:2.5rem;">
+                <div
+                    style="background:rgba(255,255,255,0.7); backdrop-filter:blur(15px); border-radius:1.5rem; padding:2rem; border:1px solid rgba(255,255,255,0.5); box-shadow:0 20px 40px rgba(0,0,0,0.05);">
                     <h3
-                        style="color:#002f45; font-weight:700; font-size:1rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem;">
+                        style="color:#002f45; font-weight:700; font-size:1.15rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem; font-family:'Playfair Display',serif;">
                         ✏️ Buat Jenis Tugas Baru
                         <button onclick="toggleForm()"
-                            style="margin-left:auto; background:none; border:none; color:#002f45; opacity:0.4; cursor:pointer; font-size:1.25rem;">×</button>
+                            style="margin-left:auto; background:rgba(0,47,69,0.05); border:none; color:#002f45; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:1.25rem; display:flex; align-items:center; justify-content:center;">&times;</button>
                     </h3>
 
                     <form method="POST" action="{{ route('panitia.tugas.store') }}">
                         @csrf
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-bottom:1.5rem;">
                             <div style="grid-column:1/-1;">
                                 <label
-                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Nama
+                                    style="display:block; font-size:0.7rem; font-weight:700; color:#002f45; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.6;">Nama
                                     Tugas *</label>
                                 <input type="text" name="nama_tugas" value="{{ old('nama_tugas') }}" required
-                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.9rem; color:#002f45; box-sizing:border-box; outline:none;"
-                                    onfocus="this.style.borderColor='#002f45'" onblur="this.style.borderColor='#bdd1d3'"
-                                    placeholder="Contoh: Tugas 1 — Essay Motivasi, Puisi Kebangsaan, dst.">
+                                    style="width:100%; padding:0.85rem 1.25rem; border:1px solid rgba(189,209,211,0.8); border-radius:0.8rem; font-size:0.95rem; color:#002f45; background:rgba(255,255,255,0.5); outline:none; transition:border-color 0.3s;"
+                                    onfocus="this.style.borderColor='#002f45'; this.style.background='white';"
+                                    onblur="this.style.borderColor='rgba(189,209,211,0.8)'; this.style.background='rgba(255,255,255,0.5)';"
+                                    placeholder="Misal: Essay Motivasi WTHME">
                             </div>
 
                             <div style="grid-column:1/-1;">
                                 <label
-                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Deskripsi
-                                    / Petunjuk <span style="font-weight:400; opacity:0.5;">(opsional)</span></label>
-                                <textarea name="deskripsi" rows="2"
-                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.875rem; color:#002f45; box-sizing:border-box; outline:none; resize:vertical; font-family:inherit;"
-                                    onfocus="this.style.borderColor='#002f45'" onblur="this.style.borderColor='#bdd1d3'"
-                                    placeholder="Jelaskan tugas ini: ketentuan, format, dll.">{{ old('deskripsi') }}</textarea>
+                                    style="display:block; font-size:0.7rem; font-weight:700; color:#002f45; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.6;">Deskripsi
+                                    / Petunjuk</label>
+                                <textarea name="deskripsi" rows="3"
+                                    style="width:100%; padding:0.85rem 1.25rem; border:1px solid rgba(189,209,211,0.8); border-radius:0.8rem; font-size:0.9rem; color:#002f45; background:rgba(255,255,255,0.5); outline:none; resize:vertical; font-family:inherit;"
+                                    onfocus="this.style.borderColor='#002f45'; this.style.background='white';"
+                                    onblur="this.style.borderColor='rgba(189,209,211,0.8)'; this.style.background='rgba(255,255,255,0.5)';"
+                                    placeholder="Jelaskan ketentuan tugas secara singkat...">{{ old('deskripsi') }}</textarea>
                             </div>
 
                             <div>
                                 <label
-                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Deadline
-                                    <span style="font-weight:400; opacity:0.5;">(opsional)</span></label>
+                                    style="display:block; font-size:0.7rem; font-weight:700; color:#002f45; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.6;">Deadline</label>
                                 <input type="datetime-local" name="deadline" value="{{ old('deadline') }}"
-                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.9rem; color:#002f45; box-sizing:border-box; outline:none;"
-                                    onfocus="this.style.borderColor='#002f45'" onblur="this.style.borderColor='#bdd1d3'">
-                                <p style="color:#002f45; opacity:0.4; font-size:0.72rem; margin-top:0.3rem;">Kosongkan jika
-                                    tidak ada batas waktu.</p>
+                                    style="width:100%; padding:0.85rem 1.25rem; border:1px solid rgba(189,209,211,0.8); border-radius:0.8rem; font-size:0.9rem; color:#002f45; background:rgba(255,255,255,0.5); outline:none;">
                             </div>
 
                             <div>
                                 <label
-                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Tipe
-                                    File yang Diizinkan *</label>
+                                    style="display:block; font-size:0.7rem; font-weight:700; color:#002f45; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.6;">Tipe
+                                    File *</label>
                                 <select name="tipe_file"
-                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.9rem; color:#002f45; background:white; outline:none; box-sizing:border-box;">
-                                    <option value="semua" {{ old('tipe_file') === 'semua' ? 'selected' : '' }}>Semua (PDF,
-                                        gambar, doc, zip)</option>
-                                    <option value="pdf" {{ old('tipe_file') === 'pdf' ? 'selected' : '' }}>PDF saja
+                                    style="width:100%; padding:0.85rem 1.25rem; border:1px solid rgba(189,209,211,0.8); border-radius:0.8rem; font-size:0.9rem; color:#002f45; background:rgba(255,255,255,0.5); outline:none;">
+                                    <option value="semua" {{ old('tipe_file') === 'semua' ? 'selected' : '' }}>Semua Format
+                                    </option>
+                                    <option value="pdf" {{ old('tipe_file') === 'pdf' ? 'selected' : '' }}>PDF Saja
                                     </option>
                                     <option value="gambar" {{ old('tipe_file') === 'gambar' ? 'selected' : '' }}>Gambar
-                                        saja (jpg/png)</option>
+                                        (JPG/PNG)</option>
                                 </select>
                             </div>
 
                             <div>
                                 <label
-                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Maks.
-                                    Ukuran File *</label>
+                                    style="display:block; font-size:0.7rem; font-weight:700; color:#002f45; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.6;">Maks.
+                                    Ukuran</label>
                                 <select name="maks_ukuran"
-                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.9rem; color:#002f45; background:white; outline:none; box-sizing:border-box;">
-                                    <option value="2048" {{ old('maks_ukuran') == 2048 ? 'selected' : '' }}>2 MB
+                                    style="width:100%; padding:0.85rem 1.25rem; border:1px solid rgba(189,209,211,0.8); border-radius:0.8rem; font-size:0.9rem; color:#002f45; background:rgba(255,255,255,0.5); outline:none;">
+                                    <option value="2048" {{ old('maks_ukuran') == 2048 ? 'selected' : '' }}>2 MB</option>
+                                    <option value="5120" {{ old('maks_ukuran') == 5120 ? 'selected' : '' }} selected>5 MB
                                     </option>
-                                    <option value="5120" {{ old('maks_ukuran') == 5120 ? 'selected' : '' }} selected>5
-                                        MB (default)</option>
                                     <option value="10240" {{ old('maks_ukuran') == 10240 ? 'selected' : '' }}>10 MB
                                     </option>
-                                    <option value="20480" {{ old('maks_ukuran') == 20480 ? 'selected' : '' }}>20 MB
-                                    </option>
                                 </select>
                             </div>
 
                             <div>
                                 <label
-                                    style="display:block; font-size:0.75rem; font-weight:600; color:#002f45; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">Urutan
+                                    style="display:block; font-size:0.7rem; font-weight:700; color:#002f45; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.6;">Urutan
                                     Tampil</label>
-                                <input type="number" name="urutan" value="{{ old('urutan', 0) }}" min="0"
-                                    style="width:100%; padding:0.75rem 1rem; border:2px solid #bdd1d3; border-radius:0.6rem; font-size:0.9rem; color:#002f45; box-sizing:border-box; outline:none;"
-                                    onfocus="this.style.borderColor='#002f45'" onblur="this.style.borderColor='#bdd1d3'"
-                                    placeholder="0, 1, 2 …">
-                                <p style="color:#002f45; opacity:0.4; font-size:0.72rem; margin-top:0.3rem;">Angka kecil
-                                    tampil lebih dulu.</p>
+                                <input type="number" name="urutan" value="{{ old('urutan', 0) }}"
+                                    style="width:100%; padding:0.85rem 1.25rem; border:1px solid rgba(189,209,211,0.8); border-radius:0.8rem; font-size:0.9rem; color:#002f45; background:rgba(255,255,255,0.5); outline:none;">
                             </div>
                         </div>
 
-                        <div style="display:flex; gap:0.75rem;">
+                        <div style="display:flex; gap:1rem;">
                             <button type="submit"
-                                style="flex:1; padding:0.875rem; background:#002f45; color:#d2c296; font-weight:700; border:none; border-radius:0.75rem; cursor:pointer; font-size:0.95rem;"
-                                onmouseover="this.style.background='#00405e'" onmouseout="this.style.background='#002f45'">
-                                🗂 Buat Tugas
+                                style="flex:1; padding:1rem; background:#002f45; color:#d2c296; font-weight:700; border:none; border-radius:1rem; cursor:pointer; font-size:0.95rem; box-shadow:0 10px 20px rgba(0,47,69,0.15);">
+                                🗂 Simpan Tugas
                             </button>
                             <button type="button" onclick="toggleForm()"
-                                style="padding:0.875rem 1.5rem; background:transparent; color:#002f45; border:2px solid #bdd1d3; border-radius:0.75rem; cursor:pointer; font-size:0.875rem; font-weight:600;">
+                                style="padding:1rem 2rem; background:transparent; color:#002f45; border:1px solid rgba(0,47,69,0.2); border-radius:1rem; cursor:pointer; font-size:0.875rem; font-weight:600;">
                                 Batal
                             </button>
                         </div>
@@ -153,74 +149,78 @@
             {{-- Daftar Tugas --}}
             @if ($tugasList->isEmpty())
                 <div
-                    style="background:white; border-radius:1rem; padding:3rem; text-align:center; border:2px solid #bdd1d3;">
-                    <div style="font-size:3rem; margin-bottom:1rem;">📚</div>
-                    <p style="color:#002f45; opacity:0.5; margin-bottom:1rem;">Belum ada jenis tugas yang dibuat.</p>
+                    style="background:rgba(255,255,255,0.5); backdrop-filter:blur(10px); border-radius:1.5rem; padding:4rem 2rem; text-align:center; border:1px solid rgba(255,255,255,0.4);">
+                    <div style="font-size:3.5rem; margin-bottom:1rem; opacity:0.8;">📂</div>
+                    <p style="color:#002f45; opacity:0.5; font-size:1.1rem; margin-bottom:1.5rem;">Belum ada jenis tugas
+                        yang dibuat.</p>
                     @if (auth()->user()->isAcara())
                         <button onclick="toggleForm()"
-                            style="padding:0.75rem 2rem; background:#002f45; color:#d2c296; border:none; border-radius:0.75rem; cursor:pointer; font-weight:700; font-size:0.875rem;">
-                            + Buat Tugas Pertama
+                            style="padding:0.85rem 2.5rem; background:#002f45; color:#d2c296; border:none; border-radius:0.8rem; cursor:pointer; font-weight:700;">
+                            + Mulai Buat Tugas
                         </button>
                     @endif
                 </div>
             @else
-                <div style="display:flex; flex-direction:column; gap:1rem;">
+                <div style="display:flex; flex-direction:column; gap:1.25rem;">
                     @foreach ($tugasList as $tugas)
                         <div
-                            style="background:white; border-radius:1rem; padding:1.25rem 1.5rem; border:2px solid {{ $tugas->aktif ? '#bdd1d3' : '#e0decd' }}; opacity:{{ $tugas->aktif ? '1' : '0.65' }};">
-                            <div style="display:flex; align-items:flex-start; gap:1rem; flex-wrap:wrap;">
+                            style="background:rgba(255,255,255,0.6); backdrop-filter:blur(10px); border-radius:1.5rem; padding:1.5rem; border:1px solid {{ $tugas->aktif ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.05)' }}; transition:all 0.3s ease; opacity:{{ $tugas->aktif ? '1' : '0.7' }}; box-shadow:0 10px 30px rgba(0,0,0,0.02);">
+                            <div style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+
                                 {{-- Info utama --}}
-                                <div style="flex:1; min-width:220px;">
+                                <div style="flex:1; min-width:250px;">
                                     <div
-                                        style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.35rem; flex-wrap:wrap;">
-                                        <h3 style="color:#002f45; font-weight:700; font-size:1rem; margin:0;">
+                                        style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem; flex-wrap:wrap;">
+                                        <h3
+                                            style="color:#002f45; font-weight:700; font-size:1.1rem; margin:0; font-family:'Playfair Display',serif;">
                                             {{ $tugas->nama_tugas }}</h3>
                                         <span
-                                            style="padding:0.15rem 0.6rem; border-radius:999px; font-size:0.65rem; font-weight:700;
-                            {{ $tugas->aktif ? 'background:#dcfce7; color:#166534;' : 'background:#f3f4f6; color:#6b7280;' }}">
+                                            style="padding:0.25rem 0.75rem; border-radius:2rem; font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; {{ $tugas->aktif ? 'background:#dcfce7; color:#166534;' : 'background:#f3f4f6; color:#6b7280;' }}">
                                             {{ $tugas->aktif ? '● Aktif' : '● Nonaktif' }}
                                         </span>
                                         @if ($tugas->isTerlambat())
                                             <span
-                                                style="padding:0.15rem 0.6rem; border-radius:999px; font-size:0.65rem; font-weight:700; background:#fee2e2; color:#991b1b;">
-                                                ⏰ Deadline Lewat
+                                                style="padding:0.25rem 0.75rem; border-radius:2rem; font-size:0.65rem; font-weight:800; background:#fee2e2; color:#991b1b; text-transform:uppercase;">
+                                                ⏰ Tutup
                                             </span>
                                         @endif
                                     </div>
                                     @if ($tugas->deskripsi)
                                         <p
-                                            style="color:#002f45; opacity:0.6; font-size:0.8rem; margin:0 0 0.5rem 0; line-height:1.5;">
+                                            style="color:#002f45; opacity:0.6; font-size:0.85rem; margin:0 0 0.75rem 0; line-height:1.6;">
                                             {{ $tugas->deskripsi }}</p>
                                     @endif
-                                    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                                    <div style="display:flex; gap:1.25rem; flex-wrap:wrap; align-items:center;">
                                         @if ($tugas->deadline)
-                                            <span style="color:#d97706; font-size:0.75rem;">⏰
-                                                {{ $tugas->deadline->format('d M Y, H:i') }}</span>
+                                            <span
+                                                style="color:#d97706; font-size:0.75rem; font-weight:600; display:flex; align-items:center; gap:0.3rem;">
+                                                <span style="font-size:0.9rem;">⏳</span>
+                                                {{ $tugas->deadline->format('d M, H:i') }}
+                                            </span>
                                         @endif
-                                        <span style="color:#002f45; opacity:0.5; font-size:0.75rem;">
-                                            📎 {{ strtoupper($tugas->tipe_file) }} · maks
-                                            {{ round($tugas->maks_ukuran / 1024, 0) }} MB
+                                        <span style="color:#002f45; opacity:0.4; font-size:0.75rem; font-weight:500;">
+                                            📎 {{ strtoupper($tugas->tipe_file) }} ·
+                                            {{ round($tugas->maks_ukuran / 1024, 0) }}MB
                                         </span>
-                                        <span style="color:#002f45; opacity:0.5; font-size:0.75rem;">
-                                            #{{ $tugas->urutan }} · dibuat {{ $tugas->created_at->format('d/m') }}
+                                        <span style="color:#002f45; opacity:0.4; font-size:0.75rem; font-weight:500;">
+                                            #{{ $tugas->urutan }}
                                         </span>
                                     </div>
                                 </div>
 
-                                {{-- Progress pengumpulan --}}
-                                <div style="text-align:center; padding:0 1rem; border-left:1px solid #e0decd;">
+                                {{-- Progress --}}
+                                <div
+                                    style="text-align:center; padding:0 1.5rem; border-left:1px solid rgba(0,47,69,0.1); border-right:1px solid rgba(0,47,69,0.1);">
                                     <div
-                                        style="color:#002f45; font-size:1.5rem; font-weight:800; font-family:'Playfair Display',serif;">
+                                        style="color:#002f45; font-size:1.75rem; font-weight:800; font-family:'Playfair Display',serif; line-height:1;">
                                         {{ $tugas->pengumpulan_count }}
                                     </div>
                                     <div
-                                        style="color:#002f45; opacity:0.5; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em;">
-                                        Dikumpulkan</div>
-                                    <div style="color:#002f45; opacity:0.4; font-size:0.7rem;">dari {{ $totalPeserta }}
-                                        peserta</div>
+                                        style="color:#002f45; opacity:0.4; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.1em; margin-top:0.3rem; font-weight:700;">
+                                        Pengumpulan</div>
                                     @if ($totalPeserta > 0)
                                         <div
-                                            style="margin-top:0.4rem; background:#e0decd; border-radius:999px; height:4px; width:80px;">
+                                            style="margin-top:0.6rem; background:rgba(0,47,69,0.1); border-radius:999px; height:4px; width:70px; margin-left:auto; margin-right:auto;">
                                             <div
                                                 style="background:#002f45; height:4px; border-radius:999px; width:{{ min(100, round(($tugas->pengumpulan_count / $totalPeserta) * 100)) }}%;">
                                             </div>
@@ -229,23 +229,21 @@
                                 </div>
 
                                 {{-- Aksi --}}
-                                <div style="display:flex; flex-direction:column; gap:0.5rem; min-width:120px;">
+                                <div style="display:flex; flex-direction:column; gap:0.5rem; min-width:140px;">
                                     <form method="POST" action="{{ route('panitia.tugas.toggle', $tugas->id) }}"
                                         style="margin:0;">
                                         @csrf
                                         <button type="submit"
-                                            style="width:100%; padding:0.4rem 0.75rem; background:{{ $tugas->aktif ? '#fef9c3' : '#dcfce7' }}; color:{{ $tugas->aktif ? '#854d0e' : '#166534' }}; border:none; border-radius:0.4rem; cursor:pointer; font-size:0.75rem; font-weight:600;">
+                                            style="width:100%; padding:0.5rem; background:{{ $tugas->aktif ? 'rgba(254,249,195,0.8)' : 'rgba(220,252,231,0.8)' }}; color:{{ $tugas->aktif ? '#854d0e' : '#166534' }}; border:1px solid rgba(0,0,0,0.05); border-radius:0.6rem; cursor:pointer; font-size:0.75rem; font-weight:700; transition:all 0.2s;">
                                             {{ $tugas->aktif ? '⏸ Nonaktifkan' : '▶ Aktifkan' }}
                                         </button>
                                     </form>
                                     @if (auth()->user()->isAcara())
                                         <form method="POST" action="{{ route('panitia.tugas.destroy', $tugas->id) }}"
-                                            style="margin:0;"
-                                            onsubmit="return confirm('Hapus tugas ini beserta SEMUA file pengumpulan peserta?')">
-                                            @csrf
-                                            @method('DELETE')
+                                            style="margin:0;" onsubmit="return confirm('Hapus tugas ini?')">
+                                            @csrf @method('DELETE')
                                             <button type="submit"
-                                                style="width:100%; padding:0.4rem 0.75rem; background:#fee2e2; color:#991b1b; border:none; border-radius:0.4rem; cursor:pointer; font-size:0.75rem; font-weight:600;">
+                                                style="width:100%; padding:0.5rem; background:rgba(254,226,226,0.6); color:#991b1b; border:1px solid rgba(0,0,0,0.05); border-radius:0.6rem; cursor:pointer; font-size:0.75rem; font-weight:700;">
                                                 🗑 Hapus
                                             </button>
                                         </form>
@@ -256,7 +254,6 @@
                     @endforeach
                 </div>
             @endif
-
         </div>
     </div>
 
@@ -269,10 +266,7 @@
                 block: 'start'
             });
         }
-        @if ($errors->any())
-            document.addEventListener('DOMContentLoaded', () => {
-                document.getElementById('form-tugas').style.display = 'block';
-            });
-        @endif
     </script>
+
+    
 @endsection

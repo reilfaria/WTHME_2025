@@ -15,6 +15,7 @@ use App\Http\Controllers\KesehatanController;
 use App\Http\Controllers\NotulensiController;
 use App\Http\Controllers\MentoringController;
 use App\Http\Controllers\GanttController;
+use App\Http\Controllers\BarangController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -46,6 +47,15 @@ Route::middleware(['auth'])->group(function () {
     // --- PANITIA ---
     Route::prefix('panitia')->name('panitia.')->middleware('panitia')->group(function () {
         Route::get('/', [PanitiaController::class, 'index'])->name('index');
+        // Di dalam Route::prefix('panitia')->name('panitia.')...
+        Route::post('/links', [PanitiaController::class, 'storeLink'])->name('links.store');
+        Route::delete('/links/{id}', [PanitiaController::class, 'destroyLink'])->name('links.destroy');
+        Route::post('/broadcast-peserta', [PanitiaController::class, 'storeInfoPeserta'])->name('info.peserta.store');
+        Route::delete('/broadcast-peserta/{id}', [PanitiaController::class, 'destroyInfoPeserta'])->name('info.peserta.destroy');
+        // Di dalam Route::prefix('panitia')...
+        Route::get('/informasi-peserta', [PanitiaController::class, 'indexInfoPeserta'])->name('info.peserta.index');
+        Route::post('/informasi-peserta', [PanitiaController::class, 'storeInfoPeserta'])->name('info.peserta.store');
+        Route::delete('/informasi-peserta/{id}', [PanitiaController::class, 'destroyInfoPeserta'])->name('info.peserta.destroy');
 
         // QR & ABSENSI
         Route::get('/qr/buat',                 [QrController::class, 'create'])->name('qr.create');
@@ -135,6 +145,20 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{id}', [GanttController::class, 'update'])->name('update');
             Route::delete('/{id}', [GanttController::class, 'destroy'])->name('destroy');
         });
+
+        Route::prefix('barang')->name('barang.')->group(function () {
+            // List kelompok (semua panitia bisa lihat)
+            Route::get('/', [\App\Http\Controllers\BarangController::class, 'panitiaIndex'])->name('index');
+            Route::get('/kelompok/{kelompok}', [\App\Http\Controllers\BarangController::class, 'panitiaKelompok'])->name('kelompok');
+            Route::get('/rekap', [\App\Http\Controllers\BarangController::class, 'panitiaRekap'])->name('rekap');
+            Route::get('/export', [\App\Http\Controllers\BarangController::class, 'exportRekap'])->name('export');
+
+            // Manage barang (hanya divisi Logistik, dicek di controller)
+            Route::get('/manage', [\App\Http\Controllers\BarangController::class, 'manageIndex'])->name('manage');
+            Route::post('/manage', [\App\Http\Controllers\BarangController::class, 'manageStore'])->name('manage.store');
+            Route::put('/manage/{id}', [\App\Http\Controllers\BarangController::class, 'manageUpdate'])->name('manage.update');
+            Route::delete('/manage/{id}', [\App\Http\Controllers\BarangController::class, 'manageDestroy'])->name('manage.destroy');
+        });
     }); // <--- PENUTUP PANITIA (Tadi kamu lupa ini)
 
     // --- PESERTA ---
@@ -146,6 +170,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/riwayat-penyakit', [PesertaController::class, 'simpanRiwayat'])->name('riwayat.store');
         Route::get('/tugas',             [TugasController::class, 'indexPeserta'])->name('tugas');
         Route::post('/tugas/upload',     [TugasController::class, 'uploadTugas'])->name('tugas.upload');
+        Route::get('/barang', [\App\Http\Controllers\BarangController::class, 'pesertaIndex'])->name('barang');
+        Route::patch('/barang/{barangId}', [\App\Http\Controllers\BarangController::class, 'pesertaUpdate'])->name('barang.update');
+        Route::delete('/barang/{barangId}/foto', [\App\Http\Controllers\BarangController::class, 'pesertaHapusFoto'])->name('barang.hapus-foto');
+        Route::delete('/barang/{barangId}', [\App\Http\Controllers\BarangController::class, 'pesertaReset'])->name('barang.reset');
+        // Pastikan pakai Route::delete, bukan Route::get
+        Route::delete('/peserta/barang/{id}/foto', [BarangController::class, 'deleteFoto'])->name('barang.foto.destroy');
     });
 }); // <--- PENUTUP AUTH
 

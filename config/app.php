@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Jakarta',
 
     /*
     |--------------------------------------------------------------------------
@@ -124,6 +124,7 @@ return [
     ],
 
     'aula_lat'    => env('AULA_LATITUDE', -5.935783581513602),
-    'aula_lng'    => env('AULA_LONGITUDE', 106.09756605183107),
+    'aula_lng'    => env('AULA_LONGITUDE', 106.03195503899879),
     'aula_radius' => env('AULA_RADIUS_METER', 100),
+
 ];

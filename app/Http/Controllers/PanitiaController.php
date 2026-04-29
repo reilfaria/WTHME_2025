@@ -7,6 +7,8 @@ use App\Models\QrSession;
 use App\Models\AbsensiPeserta;
 use App\Models\AbsensiPanitia;
 use App\Models\User;
+use App\Models\Link;
+use App\Models\InformasiPeserta;
 use Illuminate\Http\Request;
 
 class PanitiaController extends Controller
@@ -37,6 +39,9 @@ class PanitiaController extends Controller
             'ketuplak'
         ])->count();
 
+        // Ambil semua data link dari database
+        $links = \App\Models\Link::all();
+
         return view('panitia.index', compact(
             'links',
             'qrSessions',
@@ -45,5 +50,50 @@ class PanitiaController extends Controller
             'totalSeluruhPeserta',
             'totalSeluruhPanitia' // <--- 3. Masukkan ke compact
         ));
+    }
+
+    // Tambahkan method ini di dalam class
+    public function storeLink(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'url' => 'required|url',
+            'ikon' => 'required'
+        ]);
+
+        Link::create($request->all());
+        return back()->with('success', 'Link berhasil ditambahkan!');
+    }
+
+    public function destroyLink($id)
+    {
+        Link::findOrFail($id)->delete();
+        return back()->with('success', 'Link berhasil dihapus!');
+    }
+
+    // Fungsi untuk menyimpan pengumuman buat peserta
+    public function storeInfoPeserta(Request $request)
+    {
+        $request->validate([
+            'judul' => 'required',
+            'kategori' => 'required',
+            'konten' => 'nullable|string', 
+            'url_link' => 'nullable|url',
+        ]);
+
+        InformasiPeserta::create($request->all());
+        return back()->with('success', 'Pengumuman telah terkirim ke portal peserta!');
+    }
+
+    // Fungsi untuk menghapus pengumuman
+    public function destroyInfoPeserta($id)
+    {
+        InformasiPeserta::findOrFail($id)->delete();
+        return back()->with('success', 'Pengumuman dihapus.');
+    }
+    public function indexInfoPeserta()
+    {
+        $infos = \App\Models\InformasiPeserta::latest()->get();
+        return view('panitia.informasi_peserta', compact('infos'));
     }
 }

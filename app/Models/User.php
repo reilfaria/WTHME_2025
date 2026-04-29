@@ -63,7 +63,7 @@ class User extends Authenticatable
 
     public function isMentor(): bool
     {
-        return in_array($this->role, ['mentor', 'admin']);
+        return $this->divisi === 'MENTOR' || $this->role === 'admin';;
     }
     public function isAcara(): bool
     {

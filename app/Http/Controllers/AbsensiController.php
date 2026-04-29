@@ -16,6 +16,8 @@ class AbsensiController extends Controller
         '10.10.',
         '172.16.',
         '127.0.0.1',
+        '103.142.195.',
+        '103.142.',
         // Tambahkan range IP Untirta yang sebenarnya di sini
     ];
 
